@@ -8,8 +8,8 @@ import {
 } from '@/data/dummy-finance-data';
 
 export function SpendingDonut() {
-  const size = 150;
-  const strokeWidth = 14;
+  const size = 125;
+  const strokeWidth = 12;
   const radius = (size - strokeWidth) / 2;
   const circumference = 2 * Math.PI * radius;
 
@@ -17,21 +17,22 @@ export function SpendingDonut() {
   let cumulativePercent = 0;
 
   return (
-    <View className="mb-8">
-      {/* Header */}
-      <View className="flex-row justify-between items-center mb-5">
-        <Text className="text-xl font-bold text-white tracking-tight">
+    <View className="mb-7">
+      {/* Section Header */}
+      <View className="flex-row justify-between items-center mb-3">
+        <Text className="text-[19px] font-bold text-white tracking-tight">
           Spending
         </Text>
         <Pressable className="active:opacity-70">
-          <Text className="text-sm font-semibold text-indigo-400">
-            View all →
+          <Text className="text-[14px] font-semibold text-indigo-400">
+            See all →
           </Text>
         </Pressable>
       </View>
 
-      {/* Donut Chart Block */}
-      <View className="items-center justify-center my-2 py-2">
+      {/* Side-by-Side Two-Column Layout (Donut LEFT + Categories RIGHT) */}
+      <View className="flex-row items-center justify-between">
+        {/* LEFT COLUMN: 125px Compact Donut Chart */}
         <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
           <Svg width={size} height={size}>
             <G transform={`rotate(-90 ${size / 2} ${size / 2})`}>
@@ -58,43 +59,39 @@ export function SpendingDonut() {
             </G>
           </Svg>
 
-          {/* Center Text in Donut Chart */}
+          {/* Center Total Text */}
           <View className="absolute items-center justify-center">
-            <Text className="text-base font-extrabold text-white">
-              ₹{DUMMY_SPENDING_TOTAL.toLocaleString('en-IN')}
+            <Text className="text-[15px] font-extrabold text-white">
+              ₹37,450
             </Text>
-            <Text className="text-xs text-slate-400 font-medium">
+            <Text className="text-[11px] text-slate-400 font-medium">
               spent
             </Text>
           </View>
         </View>
-      </View>
 
-      {/* 4 Clean Category Rows (52-60px tap height) */}
-      <View className="gap-1 mt-4">
-        {DUMMY_SPENDING_CATEGORIES.map((cat) => (
-          <Pressable
-            key={cat.id}
-            className="flex-row justify-between items-center h-14 px-1 rounded-xl active:bg-slate-900/50">
-            <View className="flex-row items-center gap-3">
-              <View className="w-10 h-10 rounded-full bg-slate-900 border border-slate-800 items-center justify-center">
-                <Text className="text-base">{cat.emoji}</Text>
+        {/* RIGHT COLUMN: 4 Compact Category Rows (sitting right beside donut) */}
+        <View className="flex-1 pl-4 gap-1">
+          {DUMMY_SPENDING_CATEGORIES.map((cat) => (
+            <Pressable
+              key={cat.id}
+              className="flex-row justify-between items-center h-[38px] active:opacity-70">
+              <View className="flex-row items-center gap-2">
+                <Text className="text-[15px]">{cat.emoji}</Text>
+                <Text className="text-[15px] font-semibold text-slate-100">
+                  {cat.name}
+                </Text>
               </View>
-              <Text className="text-base font-semibold text-slate-100">
-                {cat.name}
-              </Text>
-            </View>
 
-            <View className="items-end">
-              <Text className="text-base font-bold text-white">
-                ₹{cat.amount.toLocaleString('en-IN')}
+              <Text className="text-[14px] font-semibold text-slate-200">
+                ₹{cat.amount.toLocaleString('en-IN')}{' '}
+                <Text className="text-[13px] text-slate-400 font-normal">
+                  · {cat.percentage}%
+                </Text>
               </Text>
-              <Text className="text-xs text-slate-400 font-medium mt-0.5">
-                {cat.percentage}%
-              </Text>
-            </View>
-          </Pressable>
-        ))}
+            </Pressable>
+          ))}
+        </View>
       </View>
     </View>
   );

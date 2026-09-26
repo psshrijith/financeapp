@@ -4,21 +4,27 @@ import { Ionicons } from '@expo/vector-icons';
 
 import { DUMMY_FINANCIAL_SNAPSHOT } from '@/data/dummy-finance-data';
 
-export function FinancialSnapshot() {
+interface FinancialSnapshotProps {
+  snapshot?: typeof DUMMY_FINANCIAL_SNAPSHOT;
+}
+
+export function FinancialSnapshot({
+  snapshot = DUMMY_FINANCIAL_SNAPSHOT,
+}: FinancialSnapshotProps) {
   const [showBalance, setShowBalance] = useState(true);
   const { totalBalance, monthlyChange, income, expenses, saved, savingsRate } =
-    DUMMY_FINANCIAL_SNAPSHOT;
+    snapshot;
 
   return (
-    <View className="mb-8">
-      {/* Month Title */}
-      <Text className="text-sm font-semibold text-slate-400 mb-2">
+    <View className="mb-7">
+      {/* Month Label */}
+      <Text className="text-[14px] font-semibold text-slate-400 mb-1">
         September
       </Text>
 
-      {/* Primary Balance Row */}
+      {/* Primary Hero Balance */}
       <View className="flex-row items-center gap-3">
-        <Text className="text-3.5xl font-black text-white tracking-tight">
+        <Text className="text-[36px] font-black text-white tracking-tight leading-none">
           {showBalance ? `₹${totalBalance.toLocaleString('en-IN')}` : '••••••••'}
         </Text>
         <Pressable onPress={() => setShowBalance(!showBalance)} className="active:opacity-70 p-1">
@@ -30,13 +36,13 @@ export function FinancialSnapshot() {
         </Pressable>
       </View>
 
-      <Text className="text-sm text-slate-400 font-medium mt-1">
+      <Text className="text-[14px] text-slate-400 font-normal mt-1">
         Total balance
       </Text>
 
       <View className="flex-row items-center gap-1.5 mt-2">
-        <Ionicons name="trending-up" size={15} color="#34D399" />
-        <Text className="text-emerald-400 font-semibold text-xs">
+        <Ionicons name="trending-up" size={14} color="#34D399" />
+        <Text className="text-emerald-400 font-semibold text-[13px]">
           ↑ ₹{monthlyChange.toLocaleString('en-IN')} this month
         </Text>
       </View>
@@ -44,32 +50,40 @@ export function FinancialSnapshot() {
       {/* Subtle Horizontal Divider */}
       <View className="h-px bg-slate-800/80 my-5" />
 
-      {/* Income & Expenses Grid */}
-      <View className="flex-row justify-between mb-4">
-        <View>
-          <Text className="text-sm text-slate-400 font-medium mb-1">Income</Text>
-          <Text className="text-lg font-bold text-white">
+      {/* 3-Column Cash Flow Summary (NO 3 separate cards) */}
+      <View className="flex-row justify-between items-start divide-x divide-slate-800/80">
+        {/* Income Column */}
+        <View className="flex-1 pr-2">
+          <Text className="text-[13px] text-slate-400 font-normal mb-0.5">
+            Income
+          </Text>
+          <Text className="text-[17px] font-bold text-white">
             ₹{income.toLocaleString('en-IN')}
           </Text>
         </View>
 
-        <View className="items-end">
-          <Text className="text-sm text-slate-400 font-medium mb-1">Expenses</Text>
-          <Text className="text-lg font-bold text-white">
+        {/* Expenses Column */}
+        <View className="flex-1 px-3">
+          <Text className="text-[13px] text-slate-400 font-normal mb-0.5">
+            Expenses
+          </Text>
+          <Text className="text-[17px] font-bold text-white">
             ₹{expenses.toLocaleString('en-IN')}
           </Text>
         </View>
-      </View>
 
-      {/* Saved Summary */}
-      <View className="mt-1">
-        <Text className="text-sm text-slate-400 font-medium mb-1">Saved</Text>
-        <Text className="text-xl font-extrabold text-white">
-          ₹{saved.toLocaleString('en-IN')}{' '}
-          <Text className="text-sm font-semibold text-indigo-400">
-            · {savingsRate}%
+        {/* Saved Column */}
+        <View className="flex-1 pl-3">
+          <Text className="text-[13px] text-slate-400 font-normal mb-0.5">
+            Saved
           </Text>
-        </Text>
+          <Text className="text-[17px] font-bold text-white">
+            ₹{saved.toLocaleString('en-IN')}
+          </Text>
+          <Text className="text-[12px] font-semibold text-indigo-400 mt-0.5">
+            {savingsRate}%
+          </Text>
+        </View>
       </View>
     </View>
   );

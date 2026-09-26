@@ -1,6 +1,12 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { View, ScrollView } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
+
+import {
+  DUMMY_RECENT_TRANSACTIONS,
+  DUMMY_FINANCIAL_SNAPSHOT,
+} from '@/data/dummy-finance-data';
+import { Transaction, TransactionType } from '@/types/finance';
 
 import { Header } from './header';
 import { FinancialInsightCard } from './financial-insight';
@@ -8,14 +14,60 @@ import { FinancialSnapshot } from './financial-snapshot';
 import { SpendingDonut } from './spending-donut';
 import { RecentTransactions } from './recent-transactions';
 import { BottomNavBar } from './bottom-nav-bar';
+import { AddTransactionModal } from './add-transaction-modal';
 
 export function LandingPage() {
   const safeAreaInsets = useSafeAreaInsets();
+  const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [transactions, setTransactions] = useState<Transaction[]>(DUMMY_RECENT_TRANSACTIONS);
+  const [snapshot, setSnapshot] = useState(DUMMY_FINANCIAL_SNAPSHOT);
 
   const containerPadding = {
     paddingTop: safeAreaInsets.top,
-    // Safe bottom padding so content never gets obscured by FAB or bottom navigation
     paddingBottom: safeAreaInsets.bottom + 95,
+  };
+
+  const handleAddTransaction = (newTxData: {
+    title: string;
+    amount: number;
+    type: TransactionType;
+    category: string;
+    emoji: string;
+  }) => {
+    const newTx: Transaction = {
+      id: Date.now().toString(),
+      title: newTxData.title,
+      category: `${newTxData.category} · Today`,
+      amount: newTxData.amount,
+      date: 'Today',
+      type: newTxData.type,
+      emoji: newTxData.emoji,
+      iconBg: newTxData.type === 'income' ? '#D1FAE5' : '#FEF3C7',
+    };
+
+    // Prepend new transaction to list
+    setTransactions((prev) => [newTx, ...prev]);
+
+    // Update financial snapshot calculations dynamically
+    setSnapshot((prev) => {
+      const isIncome = newTxData.type === 'income';
+      const newIncome = isIncome ? prev.income + newTxData.amount : prev.income;
+      const newExpenses = !isIncome ? prev.expenses + newTxData.amount : prev.expenses;
+      const newTotalBalance = isIncome
+        ? prev.totalBalance + newTxData.amount
+        : prev.totalBalance - newTxData.amount;
+      const newSaved = Math.max(0, newIncome - newExpenses);
+      const newSavingsRate = newIncome > 0 ? Math.round((newSaved / newIncome) * 100) : 0;
+
+      return {
+        ...prev,
+        totalBalance: newTotalBalance,
+        income: newIncome,
+        expenses: newExpenses,
+        saved: newSaved,
+        savingsRate: newSavingsRate,
+      };
+    });
   };
 
   return (
@@ -31,22 +83,29 @@ export function LandingPage() {
           {/* 1. Header */}
           <Header />
 
-          {/* 2. Insight (FIRST main content after header) */}
+          {/* 2. Insight (FIRST major section immediately below header) */}
           <FinancialInsightCard />
 
-          {/* 3. Financial Snapshot (Single clean section, NO nested cards) */}
-          <FinancialSnapshot />
+          {/* 3. Balance Hero + Cash Flow Summary */}
+          <FinancialSnapshot snapshot={snapshot} />
 
-          {/* 4. Spending (Donut Chart + 4 Categories, NO progress bars) */}
+          {/* 4. Spending Visualization (Donut LEFT + Categories RIGHT) */}
           <SpendingDonut />
 
-          {/* 5. Recent Transactions (3 items, subtle dividers) */}
-          <RecentTransactions />
+          {/* 5. Recent Transactions */}
+          <RecentTransactions transactions={transactions} />
         </View>
       </ScrollView>
 
       {/* 6. Fixed Bottom Navigation & FAB */}
-      <BottomNavBar />
+      <BottomNavBar onPressAdd={() => setIsAddModalVisible(true)} />
+
+      {/* 7. Add Transaction Action Sheet / Modal */}
+      <AddTransactionModal
+        visible={isAddModalVisible}
+        onClose={() => setIsAddModalVisible(false)}
+        onAddTransaction={handleAddTransaction}
+      />
     </View>
   );
 }
