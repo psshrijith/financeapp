@@ -9,13 +9,25 @@ export interface Transaction {
   amount: number;
   date: string;
   type: TransactionType;
-  icon: keyof typeof Ionicons.glyphMap;
+  icon?: keyof typeof Ionicons.glyphMap;
+  emoji?: string;
   iconBg: string;
 }
 
-export interface AccountSummary {
-  totalBalance: number;
-  monthlyIncome: number;
-  monthlyExpenses: number;
-  accountNumber: string;
+export interface SpendingCategory {
+  id: string;
+  name: string;
+  emoji: string;
+  amount: number;
+  percentage: number; // e.g. 23 for 23%
+  color: string;
+}
+
+export interface FinancialInsight {
+  title: string;
+  highlightText: string;
+  amount: number;
+  percentageChange: number;
+  comparePeriod: string;
+  budgetMessage?: string;
 }
