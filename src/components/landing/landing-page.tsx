@@ -8,12 +8,12 @@ import {
 } from '@/data/dummy-finance-data';
 import { Transaction, TransactionType } from '@/types/finance';
 
-import { Header } from './header';
-import { FinancialInsightCard } from './financial-insight';
-import { FinancialSnapshot } from './financial-snapshot';
-import { SpendingDonut } from './spending-donut';
+import { FinanceHeader } from './finance-header';
+import { InsightCard } from './insight-card';
+import { BalanceSummary, CashFlowSummary } from './balance-summary';
+import { SpendingSection } from './spending-section';
 import { RecentTransactions } from './recent-transactions';
-import { BottomNavBar } from './bottom-nav-bar';
+import { BottomNavigation } from './bottom-navigation';
 import { AddTransactionModal } from './add-transaction-modal';
 
 export function LandingPage() {
@@ -24,6 +24,7 @@ export function LandingPage() {
 
   const containerPadding = {
     paddingTop: safeAreaInsets.top,
+    // Safe bottom padding so content never gets obscured by FAB or bottom navigation
     paddingBottom: safeAreaInsets.bottom + 95,
   };
 
@@ -80,27 +81,30 @@ export function LandingPage() {
         ]}
         showsVerticalScrollIndicator={false}>
         <View className="w-full">
-          {/* 1. Header */}
-          <Header />
+          {/* 1. Finance Header */}
+          <FinanceHeader />
 
-          {/* 2. Insight (FIRST major section immediately below header) */}
-          <FinancialInsightCard />
+          {/* 2. Insight Card (FIRST major content section) */}
+          <InsightCard />
 
-          {/* 3. Balance Hero + Cash Flow Summary */}
-          <FinancialSnapshot snapshot={snapshot} />
+          {/* 3. Hero Balance Summary */}
+          <BalanceSummary snapshot={snapshot} />
 
-          {/* 4. Spending Visualization (Donut LEFT + Categories RIGHT) */}
-          <SpendingDonut />
+          {/* 4. Cash Flow Summary (Income, Expenses, Saved) */}
+          <CashFlowSummary snapshot={snapshot} />
 
-          {/* 5. Recent Transactions */}
+          {/* 5. Spending Section (Compact 2-Column: Donut LEFT + Categories RIGHT) */}
+          <SpendingSection />
+
+          {/* 6. Recent Transactions (3 items with subtle dividers) */}
           <RecentTransactions transactions={transactions} />
         </View>
       </ScrollView>
 
-      {/* 6. Fixed Bottom Navigation & FAB */}
-      <BottomNavBar onPressAdd={() => setIsAddModalVisible(true)} />
+      {/* 7. Fixed Bottom Navigation & FAB */}
+      <BottomNavigation onPressAdd={() => setIsAddModalVisible(true)} />
 
-      {/* 7. Add Transaction Action Sheet / Modal */}
+      {/* 8. Add Transaction Action Sheet / Modal */}
       <AddTransactionModal
         visible={isAddModalVisible}
         onClose={() => setIsAddModalVisible(false)}

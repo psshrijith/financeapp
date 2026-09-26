@@ -7,7 +7,7 @@ import {
   DUMMY_SPENDING_TOTAL,
 } from '@/data/dummy-finance-data';
 
-export function SpendingDonut() {
+export function SpendingSection() {
   const size = 125;
   const strokeWidth = 12;
   const radius = (size - strokeWidth) / 2;
@@ -62,7 +62,7 @@ export function SpendingDonut() {
           {/* Center Total Text */}
           <View className="absolute items-center justify-center">
             <Text className="text-[15px] font-extrabold text-white">
-              ₹37,450
+              ₹{DUMMY_SPENDING_TOTAL.toLocaleString('en-IN')}
             </Text>
             <Text className="text-[11px] text-slate-400 font-medium">
               spent
@@ -70,12 +70,12 @@ export function SpendingDonut() {
           </View>
         </View>
 
-        {/* RIGHT COLUMN: 4 Compact Category Rows (sitting right beside donut) */}
+        {/* RIGHT COLUMN: 4 Compact Category Rows (48–56px high) */}
         <View className="flex-1 pl-4 gap-1">
           {DUMMY_SPENDING_CATEGORIES.map((cat) => (
             <Pressable
               key={cat.id}
-              className="flex-row justify-between items-center h-[38px] active:opacity-70">
+              className="flex-row justify-between items-center h-[42px] active:opacity-70">
               <View className="flex-row items-center gap-2">
                 <Text className="text-[15px]">{cat.emoji}</Text>
                 <Text className="text-[15px] font-semibold text-slate-100">

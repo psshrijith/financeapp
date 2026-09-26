@@ -5,11 +5,11 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 type TabType = 'home' | 'transactions' | 'goals' | 'more';
 
-interface BottomNavBarProps {
+interface BottomNavigationProps {
   onPressAdd?: () => void;
 }
 
-export function BottomNavBar({ onPressAdd }: BottomNavBarProps) {
+export function BottomNavigation({ onPressAdd }: BottomNavigationProps) {
   const insets = useSafeAreaInsets();
   const [activeTab, setActiveTab] = useState<TabType>('home');
 
@@ -18,7 +18,7 @@ export function BottomNavBar({ onPressAdd }: BottomNavBarProps) {
       className="absolute bottom-0 left-0 right-0 z-40 px-4 pointer-events-box-none"
       style={{ paddingBottom: Math.max(insets.bottom, 12) }}>
       
-      {/* Primary Floating Action Pill (Paytm-style "+ Add Transaction") */}
+      {/* Primary Floating Action Pill ("+ Add Transaction") */}
       <View className="align-self-center items-center -mb-4 z-50 pointer-events-auto">
         <Pressable
           onPress={onPressAdd}
