@@ -1,8 +1,17 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { DUMMY_SPENDING_CATEGORIES } from '@/data/dummy-finance-data';
+import { SpendingCategory } from '@/types/finance';
 
-export function SpendingSection() {
+interface SpendingSectionProps {
+  categories?: SpendingCategory[];
+}
+
+export function SpendingSection({ categories }: SpendingSectionProps) {
+  const displayCategories = categories && categories.length > 0
+    ? categories
+    : DUMMY_SPENDING_CATEGORIES;
+
   return (
     <View className="mb-8">
       {/* Section Header */}
@@ -19,7 +28,7 @@ export function SpendingSection() {
 
       {/* Cardless Category List */}
       <View className="space-y-4">
-        {DUMMY_SPENDING_CATEGORIES.map((cat, index) => {
+        {displayCategories.map((cat, index) => {
           const isIncrease = cat.changePercentage?.startsWith('↑');
           return (
             <View key={cat.id}>
@@ -65,4 +74,5 @@ export function SpendingSection() {
     </View>
   );
 }
+
 

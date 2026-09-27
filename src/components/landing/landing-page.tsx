@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { View, ScrollView } from 'react-native';
+import { View } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
 import {
@@ -7,34 +7,19 @@ import {
   DUMMY_FINANCIAL_SNAPSHOT,
   DUMMY_NET_WORTH_DATA,
 } from '@/data/dummy-finance-data';
-import { Transaction, TransactionType } from '@/types/finance';
+import {
+  RESTORED_TRANSACTIONS,
+  RESTORED_SNAPSHOT,
+  RESTORED_CATEGORIES,
+  RESTORED_NET_WORTH,
+} from '@/data/restored-data-loader';
+import { Transaction, TransactionType, SpendingCategory } from '@/types/finance';
 
-import { FinanceHeader } from './finance-header';
-import { InsightCard } from './insight-card';
-import { BalanceSummary, CashFlowSummary } from './balance-summary';
-import { SpendingSection } from './spending-section';
-import { RecentTransactions } from './recent-transactions';
+import { HomeView } from './home-view';
 import { BottomNavigation, TabType } from './bottom-navigation';
 import { AddTransactionModal } from './add-transaction-modal';
 import { NetWorthPage } from '../net-worth/net-worth-page';
 import { MorePage } from '../more/more-page';
-
-const EMPTY_SNAPSHOT = {
-  totalBalance: 0,
-  monthlyChange: 0,
-  income: 0,
-  expenses: 0,
-  saved: 0,
-  savingsRate: 0,
-};
-
-const EMPTY_NET_WORTH = {
-  totalNetWorth: 0,
-  monthlyChange: 0,
-  assets: 0,
-  liabilities: 0,
-  breakdown: [],
-};
 
 export function LandingPage() {
   const safeAreaInsets = useSafeAreaInsets();
@@ -42,10 +27,11 @@ export function LandingPage() {
   const [showCategorySplit, setShowCategorySplit] = useState(true);
   const [useDemoData, setUseDemoData] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
+  const [isRestored, setIsRestored] = useState(true);
 
-  // User's actual transactions added during usage
-  const [userTransactions, setUserTransactions] = useState<Transaction[]>([]);
-  const [userSnapshot, setUserSnapshot] = useState(EMPTY_SNAPSHOT);
+  const [userTransactions, setUserTransactions] = useState<Transaction[]>(RESTORED_TRANSACTIONS);
+  const [userSnapshot, setUserSnapshot] = useState(RESTORED_SNAPSHOT);
+  const [userCategories, setUserCategories] = useState<SpendingCategory[]>(RESTORED_CATEGORIES);
 
   const activeTransactions = useDemoData
     ? DUMMY_RECENT_TRANSACTIONS
@@ -53,31 +39,19 @@ export function LandingPage() {
 
   const activeSnapshot = useDemoData ? DUMMY_FINANCIAL_SNAPSHOT : userSnapshot;
 
-  const activeNetWorth = useDemoData
-    ? DUMMY_NET_WORTH_DATA
-    : {
-        totalNetWorth: userSnapshot.totalBalance,
-        monthlyChange: userSnapshot.totalBalance,
-        assets: userSnapshot.totalBalance,
-        liabilities: 0,
-        breakdown:
-          userSnapshot.totalBalance > 0
-            ? [
-                {
-                  id: 'nw-user-1',
-                  name: 'Current Cash Balance',
-                  category: 'Cash',
-                  amount: userSnapshot.totalBalance,
-                  percentageOfAssets: '100% of assets',
-                  dotColor: '#34D399',
-                },
-              ]
-            : [],
-      };
+  const activeNetWorth = useDemoData ? DUMMY_NET_WORTH_DATA : RESTORED_NET_WORTH;
 
   const containerPadding = {
     paddingTop: safeAreaInsets.top,
     paddingBottom: safeAreaInsets.bottom + 95,
+  };
+
+  const handleRestoreBackup = () => {
+    setUserTransactions(RESTORED_TRANSACTIONS);
+    setUserSnapshot(RESTORED_SNAPSHOT);
+    setUserCategories(RESTORED_CATEGORIES);
+    setUseDemoData(false);
+    setIsRestored(true);
   };
 
   const handleAddTransaction = (newTxData: {
@@ -132,45 +106,26 @@ export function LandingPage() {
           onToggleCategorySplit={setShowCategorySplit}
           useDemoData={useDemoData}
           onToggleDemoData={setUseDemoData}
+          onRestoreBackup={handleRestoreBackup}
+          isRestored={isRestored}
         />
       ) : (
-        <ScrollView
-          className="flex-1"
-          contentContainerStyle={[
-            { paddingHorizontal: 20 },
-            containerPadding,
-          ]}
-          showsVerticalScrollIndicator={false}>
-          <View className="w-full">
-            {/* 1. Finance Header */}
-            <FinanceHeader />
-
-            {/* 2. Insight Card */}
-            <InsightCard isDemoData={useDemoData} />
-
-            {/* 3. Hero Balance Summary */}
-            <BalanceSummary snapshot={activeSnapshot} />
-
-            {/* 4. Cash Flow Summary */}
-            <CashFlowSummary snapshot={activeSnapshot} />
-
-            {/* 5. Spending Section (Optional Category Split) */}
-            {showCategorySplit ? <SpendingSection /> : null}
-
-            {/* 6. Recent Transactions */}
-            <RecentTransactions transactions={activeTransactions} />
-          </View>
-        </ScrollView>
+        <HomeView
+          containerPadding={containerPadding}
+          useDemoData={useDemoData}
+          activeSnapshot={activeSnapshot}
+          showCategorySplit={showCategorySplit}
+          activeTransactions={activeTransactions}
+          categories={useDemoData ? undefined : userCategories}
+        />
       )}
 
-      {/* 7. Fixed Bottom Navigation & FAB */}
       <BottomNavigation
         activeTab={activeTab}
         onTabChange={setActiveTab}
         onPressAdd={() => setIsAddModalVisible(true)}
       />
 
-      {/* 8. Add Transaction Action Sheet / Modal */}
       <AddTransactionModal
         visible={isAddModalVisible}
         onClose={() => setIsAddModalVisible(false)}
@@ -180,7 +135,6 @@ export function LandingPage() {
   );
 }
 
-
-
-
 export default LandingPage;
+
+
