@@ -1,8 +1,21 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { AppThemeMode } from './theme-modal';
 
-export function GeneralPreferences() {
+interface GeneralPreferencesProps {
+  themeMode?: AppThemeMode;
+  onOpenThemeModal?: () => void;
+  onLockApp?: () => void;
+}
+
+export function GeneralPreferences({
+  themeMode = 'dim',
+  onOpenThemeModal,
+  onLockApp,
+}: GeneralPreferencesProps) {
+  const themeLabel = themeMode === 'lights-out' ? 'Lights Out (#000000)' : 'Dim (Slate)';
+
   return (
     <View className="mb-6">
       <Text className="text-[13px] uppercase tracking-wider text-slate-400 font-medium mb-3">
@@ -24,7 +37,7 @@ export function GeneralPreferences() {
           </Text>
         </Pressable>
 
-        <Pressable className="flex-row items-center justify-between p-4 active:opacity-70">
+        <Pressable onPress={onLockApp} className="flex-row items-center justify-between p-4 active:opacity-70">
           <View className="flex-row items-center gap-3">
             <View className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 items-center justify-center">
               <Ionicons name="shield-checkmark-outline" size={18} color="#34D399" />
@@ -33,22 +46,22 @@ export function GeneralPreferences() {
               Biometric Lock
             </Text>
           </View>
-          <Text className="text-[14px] text-slate-400 font-medium">
-            Enabled
+          <Text className="text-[13px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">
+            Lock Now 🔒
           </Text>
         </Pressable>
 
-        <Pressable className="flex-row items-center justify-between p-4 active:opacity-70">
+        <Pressable onPress={onOpenThemeModal} className="flex-row items-center justify-between p-4 active:opacity-70">
           <View className="flex-row items-center gap-3">
             <View className="w-9 h-9 rounded-xl bg-slate-800 border border-slate-700 items-center justify-center">
-              <Ionicons name="moon-outline" size={18} color="#94A3B8" />
+              <Ionicons name={themeMode === 'lights-out' ? 'sparkles-outline' : 'moon-outline'} size={18} color="#34D399" />
             </View>
             <Text className="text-[15px] font-medium text-white">
               Theme
             </Text>
           </View>
-          <Text className="text-[14px] text-slate-400 font-medium">
-            Dark Minimal
+          <Text className="text-[14px] text-emerald-400 font-semibold">
+            {themeLabel}
           </Text>
         </Pressable>
       </View>

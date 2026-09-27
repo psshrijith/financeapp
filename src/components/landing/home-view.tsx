@@ -21,6 +21,7 @@ interface HomeViewProps {
   showCategorySplit: boolean;
   activeTransactions: Transaction[];
   categories?: SpendingCategory[];
+  onDeleteTransaction?: (txId: string) => void;
 }
 
 export function HomeView({
@@ -30,6 +31,7 @@ export function HomeView({
   showCategorySplit,
   activeTransactions,
   categories,
+  onDeleteTransaction,
 }: HomeViewProps) {
   return (
     <ScrollView
@@ -42,7 +44,7 @@ export function HomeView({
         <BalanceSummary snapshot={activeSnapshot} />
         <CashFlowSummary snapshot={activeSnapshot} />
         {showCategorySplit ? <SpendingSection categories={categories} isDemoData={useDemoData} /> : null}
-        <RecentTransactions transactions={activeTransactions} />
+        <RecentTransactions transactions={activeTransactions} onDeleteTransaction={onDeleteTransaction} />
       </View>
     </ScrollView>
   );

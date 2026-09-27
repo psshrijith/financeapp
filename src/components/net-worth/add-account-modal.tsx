@@ -79,11 +79,12 @@ export function AddAccountModal({ visible, onClose, onAddAccount }: AddAccountMo
                 onChangeText={setName}
                 placeholder="e.g. HDFC Bank, SBI FD"
                 placeholderTextColor="#475569"
+                style={{ outlineStyle: 'none' } as any}
                 className="border-b border-slate-800/80 pb-2 text-[15px] font-normal text-white"
               />
             </View>
 
-            <View className="flex-row items-center py-1">
+            <View className="flex-row items-center py-1 overflow-hidden px-1">
               <Text className="text-[28px] font-normal text-slate-400 mr-2">₹</Text>
               <TextInput
                 value={amount}
@@ -91,7 +92,8 @@ export function AddAccountModal({ visible, onClose, onAddAccount }: AddAccountMo
                 placeholder="0"
                 placeholderTextColor="#64748B"
                 keyboardType="numeric"
-                className="text-[32px] font-normal text-white flex-1"
+                style={{ outlineStyle: 'none' } as any}
+                className="text-[32px] font-normal text-white flex-1 min-w-0"
               />
             </View>
 

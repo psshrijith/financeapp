@@ -4,6 +4,8 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { SettingsList } from './settings-list';
 
+import { AppThemeMode } from './theme-modal';
+
 interface MorePageProps {
   showCategorySplit: boolean;
   onToggleCategorySplit: (value: boolean) => void;
@@ -15,6 +17,9 @@ interface MorePageProps {
   onSetMonthlyBudget?: () => void;
   monthlyBudget?: number;
   isRestored?: boolean;
+  themeMode?: AppThemeMode;
+  onOpenThemeModal?: () => void;
+  onLockApp?: () => void;
 }
 
 export function MorePage({
@@ -28,6 +33,9 @@ export function MorePage({
   onSetMonthlyBudget,
   monthlyBudget,
   isRestored,
+  themeMode = 'dim',
+  onOpenThemeModal,
+  onLockApp,
 }: MorePageProps) {
   const safeAreaInsets = useSafeAreaInsets();
 
@@ -36,9 +44,11 @@ export function MorePage({
     paddingBottom: safeAreaInsets.bottom + 100,
   };
 
+  const bgClass = themeMode === 'lights-out' ? 'bg-black' : 'bg-slate-950';
+
   return (
     <ScrollView
-      className="flex-1 bg-slate-950"
+      className={`flex-1 ${bgClass}`}
       contentContainerStyle={[{ paddingHorizontal: 20 }, containerPadding]}
       showsVerticalScrollIndicator={false}>
       <View className="flex-row items-center gap-2.5 mb-6">
@@ -66,6 +76,9 @@ export function MorePage({
         onSetMonthlyBudget={onSetMonthlyBudget}
         monthlyBudget={monthlyBudget}
         isRestored={isRestored}
+        themeMode={themeMode}
+        onOpenThemeModal={onOpenThemeModal}
+        onLockApp={onLockApp}
       />
     </ScrollView>
   );

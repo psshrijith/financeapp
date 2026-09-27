@@ -20,18 +20,9 @@ export function createNewTransaction(data: {
   };
 }
 
-export function updateSnapshotWithTransaction(
-  prev: {
-    totalBalance: number;
-    monthlyChange: number;
-    income: number;
-    expenses: number;
-    saved: number;
-    savingsRate: number;
-  },
-  amount: number,
-  type: TransactionType
-) {
+type SnapshotData = { totalBalance: number; monthlyChange: number; income: number; expenses: number; saved: number; savingsRate: number; };
+
+export function updateSnapshotWithTransaction(prev: SnapshotData, amount: number, type: TransactionType) {
   const isIncome = type === 'income';
   const newIncome = isIncome ? prev.income + amount : prev.income;
   const newExpenses = !isIncome ? prev.expenses + amount : prev.expenses;
@@ -52,8 +43,9 @@ export function updateSnapshotWithTransaction(
   };
 }
 
-export function calculateCurrentMonthStats(transactions: Transaction[]) {
-  const currentMonthKey = '2026-09';
+export function calculateCurrentMonthStats(transactions: Transaction[], monthlyBudget: number = 0) {
+  const dynamicKey = new Date().toISOString().slice(0, 7);
+  const currentMonthKey = dynamicKey.includes('202') ? dynamicKey : '2026-09';
   let overallIncome = 0;
   let overallExpenses = 0;
   let monthIncome = 0;
@@ -81,8 +73,10 @@ export function calculateCurrentMonthStats(transactions: Transaction[]) {
 
   const displayIncome = monthIncome;
   const displayExpenses = monthExpenses;
-  const displaySaved = Math.max(0, displayIncome - displayExpenses);
-  const displayRate = displayIncome > 0 ? Math.round((displaySaved / displayIncome) * 100) : 0;
+  const startingBalance = overallIncome > 0 ? overallIncome : monthlyBudget;
+  const computedTotalBalance = Math.round(startingBalance - overallExpenses);
+  const displaySaved = Math.max(0, (displayIncome || monthlyBudget) - displayExpenses);
+  const displayRate = (displayIncome || monthlyBudget) > 0 ? Math.round((displaySaved / (displayIncome || monthlyBudget)) * 100) : 0;
 
   const categories: SpendingCategory[] = Object.values(monthCatMap)
     .sort((a, b) => b.amount - a.amount)
@@ -99,7 +93,7 @@ export function calculateCurrentMonthStats(transactions: Transaction[]) {
 
   return {
     snapshot: {
-      totalBalance: Math.round(overallIncome - overallExpenses),
+      totalBalance: computedTotalBalance,
       monthlyChange: displaySaved,
       income: displayIncome,
       expenses: displayExpenses,
@@ -120,11 +114,13 @@ export interface DayGroup {
 export function groupTransactionsByDay(transactions: Transaction[]): DayGroup[] {
   const map: Record<string, DayGroup> = {};
   const order: string[] = [];
+  const todayIso = new Date().toISOString().split('T')[0];
 
   transactions.forEach((t) => {
     let dateLabel = t.date || 'Today';
-    if (dateLabel === 'Today') dateLabel = 'Today';
-    if (dateLabel === 'Yesterday') dateLabel = 'Yesterday';
+    if (dateLabel === todayIso || dateLabel === 'Today') {
+      dateLabel = 'Today';
+    }
 
     if (!map[dateLabel]) {
       map[dateLabel] = {

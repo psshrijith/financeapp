@@ -66,7 +66,7 @@ export function AddTransactionModal({ visible, onClose, onAddTransaction }: AddT
                 <Text className="text-xs font-semibold text-red-400 text-center">⚠️ {errorMessage}</Text>
               </View>
             ) : null}
-            <View className="flex-row items-center py-1">
+            <View className="flex-row items-center py-1 overflow-hidden px-1">
               <Text className="text-[28px] font-normal text-slate-400 mr-2">₹</Text>
               <TextInput
                 value={amount}
@@ -75,16 +75,18 @@ export function AddTransactionModal({ visible, onClose, onAddTransaction }: AddT
                 placeholderTextColor="#64748B"
                 keyboardType="numeric"
                 autoFocus
-                className="text-[32px] font-normal text-white flex-1"
+                style={{ outlineStyle: 'none' } as any}
+                className="text-[32px] font-normal text-white flex-1 min-w-0"
               />
             </View>
             <View>
-              <Text className="text-[12px] font-medium text-slate-400 mb-1">Merchant or title</Text>
+              <Text className="text-[12px] font-medium text-slate-400 mb-1">Description / Title</Text>
               <TextInput
                 value={title}
                 onChangeText={setTitle}
-                placeholder="e.g. Swiggy"
+                placeholder="e.g. Swiggy, Grocery, Salary"
                 placeholderTextColor="#475569"
+                style={{ outlineStyle: 'none' } as any}
                 className="border-b border-slate-800/80 pb-2 text-[14px] font-normal text-white"
               />
             </View>

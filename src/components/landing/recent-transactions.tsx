@@ -1,15 +1,18 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
 import { Transaction } from '@/types/finance';
 import { DUMMY_RECENT_TRANSACTIONS } from '@/data/dummy-finance-data';
 
 interface RecentTransactionsProps {
   transactions?: Transaction[];
+  onDeleteTransaction?: (txId: string) => void;
 }
 
 export function RecentTransactions({
   transactions = DUMMY_RECENT_TRANSACTIONS,
+  onDeleteTransaction,
 }: RecentTransactionsProps) {
   return (
     <View className="mb-12">
@@ -42,9 +45,9 @@ export function RecentTransactions({
           {transactions.slice(0, 5).map((tx) => {
             const isIncome = tx.type === 'income';
             return (
-              <Pressable
+              <View
                 key={tx.id}
-                className="flex-row justify-between items-center py-3.5 active:opacity-70">
+                className="flex-row justify-between items-center py-3.5">
                 <View>
                   <Text className="text-[15px] font-medium text-white">
                     {tx.title}
@@ -54,13 +57,20 @@ export function RecentTransactions({
                   </Text>
                 </View>
 
-                <Text
-                  className={`text-[15px] font-semibold ${
-                    isIncome ? 'text-emerald-400' : 'text-slate-200'
-                  }`}>
-                  {isIncome ? '+' : '-'}₹{tx.amount.toLocaleString('en-IN')}
-                </Text>
-              </Pressable>
+                <View className="flex-row items-center gap-3">
+                  <Text
+                    className={`text-[15px] font-semibold ${
+                      isIncome ? 'text-emerald-400' : 'text-slate-200'
+                    }`}>
+                    {isIncome ? '+' : '-'}₹{tx.amount.toLocaleString('en-IN')}
+                  </Text>
+                  {onDeleteTransaction && (
+                    <Pressable onPress={() => onDeleteTransaction(tx.id)} className="p-1 active:opacity-60">
+                      <Ionicons name="trash-outline" size={15} color="#F87171" />
+                    </Pressable>
+                  )}
+                </View>
+              </View>
             );
           })}
         </View>

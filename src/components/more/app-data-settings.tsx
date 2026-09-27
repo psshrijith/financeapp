@@ -35,20 +35,6 @@ export function AppDataSettings({
 
       <View className="bg-slate-900/60 border border-slate-800/60 rounded-2xl divide-y divide-slate-800/40">
         <Pressable
-          onPress={onSetMonthlyBudget}
-          className="flex-row items-center justify-between p-4 active:opacity-70">
-          <View className="flex-row items-center gap-3 flex-1 pr-3">
-            <View className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 items-center justify-center">
-              <Ionicons name="wallet-outline" size={18} color="#34D399" />
-            </View>
-            <View className="flex-1">
-              <Text className="text-[15px] font-semibold text-white">Set Monthly Budget</Text>
-              <Text className="text-[12px] text-slate-400 mt-0.5">Target: ₹{monthlyBudget.toLocaleString('en-IN')}</Text>
-            </View>
-          </View>
-          <Text className="text-[13px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">Set</Text>
-        </Pressable>
-        <Pressable
           onPress={onManageCategories}
           className="flex-row items-center justify-between p-4 active:opacity-70">
           <View className="flex-row items-center gap-3 flex-1 pr-3">
@@ -82,15 +68,19 @@ export function AppDataSettings({
           onPress={onRestoreBackup}
           className="flex-row items-center justify-between p-4 active:opacity-70">
           <View className="flex-row items-center gap-3 flex-1 pr-3">
-            <View className="w-9 h-9 rounded-xl bg-blue-500/15 border border-blue-500/30 items-center justify-center">
-              <Ionicons name="cloud-download-outline" size={18} color="#60A5FA" />
+            <View className={`w-9 h-9 rounded-xl items-center justify-center ${isRestored ? 'bg-red-500/15 border border-red-500/30' : 'bg-blue-500/15 border border-blue-500/30'}`}>
+              <Ionicons name={isRestored ? 'refresh-outline' : 'cloud-download-outline'} size={18} color={isRestored ? '#F87171' : '#60A5FA'} />
             </View>
             <View className="flex-1">
               <Text className="text-[15px] font-semibold text-white">Restore Historical Backup</Text>
-              <Text className="text-[12px] text-slate-400 mt-0.5">{isRestored ? 'Historical backup data loaded' : 'Load pre-configured backup data'}</Text>
+              <Text className="text-[12px] text-slate-400 mt-0.5">
+                {isRestored ? 'Loaded historical backup · Tap to clear & reset' : 'Load pre-configured backup data'}
+              </Text>
             </View>
           </View>
-          <Text className="text-[13px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">{isRestored ? 'Active' : 'Restore'}</Text>
+          <Text className={`text-[13px] font-semibold px-2.5 py-1 rounded-full border ${isRestored ? 'text-red-400 bg-red-500/10 border-red-500/20' : 'text-emerald-400 bg-emerald-500/10 border-emerald-500/20'}`}>
+            {isRestored ? 'Clear' : 'Restore'}
+          </Text>
         </Pressable>
 
         <View className="flex-row items-center justify-between p-4">

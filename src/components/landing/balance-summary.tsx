@@ -14,6 +14,7 @@ export function BalanceSummary({
 }: BalanceSummaryProps) {
   const [showBalance, setShowBalance] = useState(true);
   const { totalBalance, monthlyChange } = snapshot;
+  const hasActivity = snapshot.income > 0 || snapshot.expenses > 0 || Math.abs(totalBalance) > 0;
 
   return (
     <View className="mb-6">
@@ -40,36 +41,46 @@ export function BalanceSummary({
           </Pressable>
         </View>
 
-        {/* Mini SVG Sparkline */}
-        <View className="w-20 h-9 items-center justify-center">
-          <Svg width={72} height={32} viewBox="0 0 72 32" fill="none">
-            <Defs>
-              <LinearGradient id="sparklineGrad" x1="0" y1="0" x2="0" y2="1">
-                <Stop offset="0%" stopColor="#34D399" stopOpacity="0.4" />
-                <Stop offset="100%" stopColor="#34D399" stopOpacity="0.0" />
-              </LinearGradient>
-            </Defs>
-            <Path
-              d="M 2 26 Q 18 28 32 18 T 54 12 T 70 4 L 70 30 L 2 30 Z"
-              fill="url(#sparklineGrad)"
-            />
-            <Path
-              d="M 2 26 Q 18 28 32 18 T 54 12 T 70 4"
-              stroke="#34D399"
-              strokeWidth="2.5"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </Svg>
-        </View>
+        {/* Mini SVG Sparkline - Only shown when user has transactions */}
+        {hasActivity ? (
+          <View className="w-20 h-9 items-center justify-center">
+            <Svg width={72} height={32} viewBox="0 0 72 32" fill="none">
+              <Defs>
+                <LinearGradient id="sparklineGrad" x1="0" y1="0" x2="0" y2="1">
+                  <Stop offset="0%" stopColor="#34D399" stopOpacity="0.4" />
+                  <Stop offset="100%" stopColor="#34D399" stopOpacity="0.0" />
+                </LinearGradient>
+              </Defs>
+              <Path
+                d="M 2 26 Q 18 28 32 18 T 54 12 T 70 4 L 70 30 L 2 30 Z"
+                fill="url(#sparklineGrad)"
+              />
+              <Path
+                d="M 2 26 Q 18 28 32 18 T 54 12 T 70 4"
+                stroke="#34D399"
+                strokeWidth="2.5"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </Svg>
+          </View>
+        ) : null}
       </View>
 
       {/* Monthly Change Trend Data Point */}
       <View className="flex-row items-center gap-1.5 mt-2">
-        <Ionicons name="trending-up" size={14} color="#34D399" />
-        <Text className="text-emerald-400 font-semibold text-[13px]">
-          ↑ ₹{monthlyChange.toLocaleString('en-IN')} this month
-        </Text>
+        {hasActivity ? (
+          <>
+            <Ionicons name="trending-up" size={14} color="#34D399" />
+            <Text className="text-emerald-400 font-semibold text-[13px]">
+              ↑ ₹{monthlyChange.toLocaleString('en-IN')} this month
+            </Text>
+          </>
+        ) : (
+          <Text className="text-slate-400 font-medium text-[13px]">
+            No activity recorded this month
+          </Text>
+        )}
       </View>
     </View>
   );

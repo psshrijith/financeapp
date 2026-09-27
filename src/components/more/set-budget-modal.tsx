@@ -48,7 +48,7 @@ export function SetBudgetModal({ visible, currentBudget, onClose, onSaveBudget }
             </View>
           ) : null}
 
-          <View className="flex-row items-center py-2 mb-4 border-b border-slate-800">
+          <View className="flex-row items-center py-2 mb-4 border-b border-slate-800 w-full overflow-hidden px-1">
             <Text className="text-[28px] font-normal text-slate-400 mr-2">₹</Text>
             <TextInput
               value={budget}
@@ -57,7 +57,8 @@ export function SetBudgetModal({ visible, currentBudget, onClose, onSaveBudget }
               placeholderTextColor="#64748B"
               keyboardType="numeric"
               autoFocus
-              className="text-[32px] font-normal text-white flex-1"
+              style={{ outlineStyle: 'none' } as any}
+              className="text-[32px] font-normal text-white flex-1 min-w-0"
             />
           </View>
 

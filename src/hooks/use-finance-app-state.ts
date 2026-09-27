@@ -1,41 +1,44 @@
-import { useState } from 'react';
-import {
-  DUMMY_RECENT_TRANSACTIONS,
-  DUMMY_FINANCIAL_SNAPSHOT,
-  DUMMY_NET_WORTH_DATA,
-} from '@/data/dummy-finance-data';
-import {
-  RESTORED_TRANSACTIONS,
-  RESTORED_SNAPSHOT,
-  RESTORED_CATEGORIES,
-  RESTORED_NET_WORTH,
-} from '@/data/restored-data-loader';
+import { useState, useEffect } from 'react';
+import { loadFromStorage, saveToStorage } from '@/utils/storage-helper';
+import { DUMMY_RECENT_TRANSACTIONS, DUMMY_FINANCIAL_SNAPSHOT, DUMMY_NET_WORTH_DATA } from '@/data/dummy-finance-data';
+import { RESTORED_TRANSACTIONS, RESTORED_SNAPSHOT, RESTORED_CATEGORIES, RESTORED_NET_WORTH } from '@/data/restored-data-loader';
 import { AccountItem, Transaction, TransactionType, SpendingCategory } from '@/types/finance';
-import {
-  createNewTransaction,
-  updateSnapshotWithTransaction,
-  calculateCurrentMonthStats,
-} from '@/utils/transaction-helper';
+import { createNewTransaction, updateSnapshotWithTransaction, calculateCurrentMonthStats } from '@/utils/transaction-helper';
 import { pickAndImportDataFile } from '@/utils/file-importer';
 import { BACKUP_CATEGORIES, CategoryItem } from '@/constants/categories';
 
+import { AppThemeMode } from '@/components/more/theme-modal';
+
 export function useFinanceAppState() {
+  const [isAppLocked, setIsAppLocked] = useState(false);
+  const [themeMode, setThemeMode] = useState<AppThemeMode>(() => loadFromStorage('app_theme_mode', 'dim'));
+  const [isThemeModalVisible, setIsThemeModalVisible] = useState(false);
   const [showCategorySplit, setShowCategorySplit] = useState(true);
   const [useDemoData, setUseDemoData] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
   const [isAddAccountModalVisible, setIsAddAccountModalVisible] = useState(false);
   const [isSetBudgetModalVisible, setIsSetBudgetModalVisible] = useState(false);
-  const [monthlyBudget, setMonthlyBudget] = useState(50000);
+  const [isRolloverModalVisible, setIsRolloverModalVisible] = useState(false);
+  const [monthlyBudget, setMonthlyBudget] = useState<number>(() => loadFromStorage('app_monthly_budget', 50000));
+  const [isInitialBudgetSet] = useState(true);
   const [isRestored, setIsRestored] = useState(false);
 
-  const [managedCategories, setManagedCategories] = useState<CategoryItem[]>(BACKUP_CATEGORIES);
-  const [userTransactions, setUserTransactions] = useState<Transaction[]>([]);
+  const [managedCategories, setManagedCategories] = useState<CategoryItem[]>(() => loadFromStorage('app_categories', BACKUP_CATEGORIES));
+  const [userTransactions, setUserTransactions] = useState<Transaction[]>(() => loadFromStorage('app_transactions', []));
   const [, setUserSnapshot] = useState(RESTORED_SNAPSHOT);
   const [userCategories, setUserCategories] = useState<SpendingCategory[]>([]);
-  const [userAccounts, setUserAccounts] = useState<AccountItem[]>([]);
+  const [userAccounts, setUserAccounts] = useState<AccountItem[]>(() => loadFromStorage('app_accounts', []));
 
-  const monthStats = calculateCurrentMonthStats(userTransactions);
+  useEffect(() => {
+    saveToStorage('app_theme_mode', themeMode);
+    saveToStorage('app_monthly_budget', monthlyBudget);
+    saveToStorage('app_categories', managedCategories);
+    saveToStorage('app_transactions', userTransactions);
+    saveToStorage('app_accounts', userAccounts);
+  }, [themeMode, monthlyBudget, managedCategories, userTransactions, userAccounts]);
+
+  const monthStats = calculateCurrentMonthStats(userTransactions, monthlyBudget);
 
   const activeTransactions = useDemoData ? DUMMY_RECENT_TRANSACTIONS : userTransactions;
   const activeSnapshot = useDemoData ? DUMMY_FINANCIAL_SNAPSHOT : monthStats.snapshot;
@@ -47,11 +50,18 @@ export function useFinanceAppState() {
   const activeNetWorth = useDemoData ? DUMMY_NET_WORTH_DATA : RESTORED_NET_WORTH;
 
   const handleRestoreBackup = () => {
-    setUserTransactions(RESTORED_TRANSACTIONS);
-    setUserSnapshot(RESTORED_SNAPSHOT);
-    setUserCategories(RESTORED_CATEGORIES);
-    setUseDemoData(false);
-    setIsRestored(true);
+    if (isRestored) {
+      setUserTransactions([]);
+      setUserSnapshot({ totalBalance: 0, monthlyChange: 0, income: 0, expenses: 0, saved: 0, savingsRate: 0 });
+      setUserCategories([]);
+      setIsRestored(false);
+    } else {
+      setUserTransactions(RESTORED_TRANSACTIONS);
+      setUserSnapshot(RESTORED_SNAPSHOT);
+      setUserCategories(RESTORED_CATEGORIES);
+      setUseDemoData(false);
+      setIsRestored(true);
+    }
   };
 
   const handleUploadFile = async () => {
@@ -67,19 +77,7 @@ export function useFinanceAppState() {
 
   const handleAddCategory = (newCat: CategoryItem) => {
     setManagedCategories((prev) => [...prev, newCat]);
-    setUserCategories((prev) => [
-      ...prev,
-      {
-        id: newCat.id,
-        name: newCat.name,
-        emoji: newCat.emoji,
-        amount: 0,
-        ofBudget: 10000,
-        percentage: 0,
-        budgetString: '₹0 spent',
-        progressLineColor: '#10B981',
-      },
-    ]);
+    setUserCategories((prev) => [...prev, { id: newCat.id, name: newCat.name, emoji: newCat.emoji, amount: 0, ofBudget: 10000, percentage: 0, budgetString: '₹0 spent', progressLineColor: '#10B981' }]);
   };
 
   const handleRemoveCategory = (catId: string) => {
@@ -87,58 +85,40 @@ export function useFinanceAppState() {
     setUserCategories((prev) => prev.filter((c) => c.id !== catId));
   };
 
-  const handleAddTransaction = (newTxData: {
-    title: string;
-    amount: number;
-    type: TransactionType;
-    category: string;
-    emoji: string;
-  }) => {
+  const handleAddTransaction = (newTxData: { title: string; amount: number; type: TransactionType; category: string; emoji: string }) => {
     const newTx = createNewTransaction(newTxData);
     setUserTransactions((prev) => [newTx, ...prev]);
     setUserSnapshot((prev) => updateSnapshotWithTransaction(prev, newTxData.amount, newTxData.type));
   };
 
-  const handleAddAccount = (acc: AccountItem) => {
-    setUserAccounts((prev) => [acc, ...prev]);
-  };
-
-  const handleDeleteAccount = (accId: string) => {
-    setUserAccounts((prev) => prev.filter((a) => a.id !== accId));
-  };
-
-  const handleSaveMonthlyBudget = (newBudget: number) => {
-    setMonthlyBudget(newBudget);
+  const handleDeleteTransaction = (txId: string) => setUserTransactions((prev) => prev.filter((t) => t.id !== txId));
+  const handleAddAccount = (acc: AccountItem) => setUserAccounts((prev) => [acc, ...prev]);
+  const handleDeleteAccount = (accId: string) => setUserAccounts((prev) => prev.filter((a) => a.id !== accId));
+  const handleSaveMonthlyBudget = (newBudget: number) => setMonthlyBudget(newBudget);
+  const handleLockApp = () => setIsAppLocked(true);
+  const handleUnlockApp = (pin: string) => { if (pin === '1234') { setIsAppLocked(false); return true; } return false; };
+  const unspentAmount = Math.max(0, monthlyBudget - monthStats.snapshot.expenses);
+  const handleRolloverToBudget = () => { setMonthlyBudget((prev) => prev + unspentAmount); setIsRolloverModalVisible(false); };
+  const handleMoveToSavings = () => {
+    setUserAccounts((prev) => [
+      ...prev,
+      { id: Date.now().toString(), name: 'Unspent Rollover', type: 'investment', amount: unspentAmount, emoji: '🏦', categoryName: 'Savings', color: '#10B981' },
+    ]);
+    setIsRolloverModalVisible(false);
   };
 
   return {
-    showCategorySplit,
-    setShowCategorySplit,
-    useDemoData,
-    setUseDemoData,
-    isAddModalVisible,
-    setIsAddModalVisible,
-    isCategoryModalVisible,
-    setIsCategoryModalVisible,
-    isAddAccountModalVisible,
-    setIsAddAccountModalVisible,
-    isSetBudgetModalVisible,
-    setIsSetBudgetModalVisible,
-    monthlyBudget,
-    isRestored,
-    managedCategories,
-    userCategories: activeCategories,
-    userAccounts,
-    activeTransactions,
-    activeSnapshot,
-    activeNetWorth,
-    handleRestoreBackup,
-    handleUploadFile,
-    handleAddCategory,
-    handleRemoveCategory,
-    handleAddTransaction,
-    handleAddAccount,
-    handleDeleteAccount,
+    isAppLocked, handleLockApp, handleUnlockApp,
+    themeMode, setThemeMode, isThemeModalVisible, setIsThemeModalVisible,
+    showCategorySplit, setShowCategorySplit, useDemoData, setUseDemoData,
+    isAddModalVisible, setIsAddModalVisible, isCategoryModalVisible, setIsCategoryModalVisible,
+    isAddAccountModalVisible, setIsAddAccountModalVisible, isSetBudgetModalVisible, setIsSetBudgetModalVisible,
+    isRolloverModalVisible, setIsRolloverModalVisible, unspentAmount,
+    handleRolloverToBudget, handleMoveToSavings,
+    monthlyBudget, isInitialBudgetSet, isRestored, managedCategories,
+    userCategories: activeCategories, userAccounts, activeTransactions, activeSnapshot, activeNetWorth,
+    handleRestoreBackup, handleUploadFile, handleAddCategory, handleRemoveCategory,
+    handleAddTransaction, handleDeleteTransaction, handleAddAccount, handleDeleteAccount,
     handleSaveMonthlyBudget,
   };
 }

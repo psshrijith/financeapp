@@ -5,16 +5,20 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { AccountItem } from '@/types/finance';
 import { NetWorthInsights } from './net-worth-insights';
 
+import { AppThemeMode } from '../more/theme-modal';
+
 interface NetWorthPageProps {
   userAccounts?: AccountItem[];
   onOpenAddAccountModal?: () => void;
   onDeleteAccount?: (accId: string) => void;
+  themeMode?: AppThemeMode;
 }
 
 export function NetWorthPage({
   userAccounts = [],
   onOpenAddAccountModal,
   onDeleteAccount,
+  themeMode = 'dim',
 }: NetWorthPageProps) {
   const safeAreaInsets = useSafeAreaInsets();
 
@@ -33,9 +37,11 @@ export function NetWorthPage({
     paddingBottom: safeAreaInsets.bottom + 100,
   };
 
+  const bgClass = themeMode === 'lights-out' ? 'bg-black' : 'bg-slate-950';
+
   return (
     <ScrollView
-      className="flex-1 bg-slate-950"
+      className={`flex-1 ${bgClass}`}
       contentContainerStyle={[{ paddingHorizontal: 20 }, containerPadding]}
       showsVerticalScrollIndicator={false}>
       {/* 1. Header & Add Button */}

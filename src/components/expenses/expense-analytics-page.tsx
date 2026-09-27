@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import { View, Text, ScrollView } from 'react-native';
+import { View, Text, ScrollView, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Transaction } from '@/types/finance';
@@ -7,20 +7,15 @@ import { PeriodSelector } from './period-selector';
 import { ExpenseSummaryCard } from './expense-summary-card';
 import { YearlyInsightCard } from './yearly-insight-card';
 import { DayByDayExpensesList } from './day-by-day-expenses-list';
-
-const MONTH_MAP: Record<string, string> = {
-  Jan: '-01-', Feb: '-02-', Mar: '-03-', Apr: '-04-',
-  May: '-05-', Jun: '-06-', Jul: '-07-', Aug: '-08-',
-  Sep: '-09-', Oct: '-10-', Nov: '-11-', Dec: '-12-',
-};
-
-interface ExpenseAnalyticsPageProps {
-  transactions: Transaction[];
-}
-
 import { groupTransactionsByDay } from '@/utils/transaction-helper';
 
-export function ExpenseAnalyticsPage({ transactions }: ExpenseAnalyticsPageProps) {
+import { AppThemeMode } from '../more/theme-modal';
+
+const MONTH_MAP: Record<string, string> = { Jan: '-01-', Feb: '-02-', Mar: '-03-', Apr: '-04-', May: '-05-', Jun: '-06-', Jul: '-07-', Aug: '-08-', Sep: '-09-', Oct: '-10-', Nov: '-11-', Dec: '-12-' };
+
+interface ExpenseAnalyticsPageProps { transactions: Transaction[]; monthlyBudget?: number; onSetMonthlyBudget?: () => void; onOpenRolloverModal?: () => void; onDeleteTransaction?: (txId: string) => void; themeMode?: AppThemeMode; }
+
+export function ExpenseAnalyticsPage({ transactions, monthlyBudget, onSetMonthlyBudget, onOpenRolloverModal, onDeleteTransaction, themeMode = 'dim' }: ExpenseAnalyticsPageProps) {
   const safeAreaInsets = useSafeAreaInsets();
   const [selectedYear, setSelectedYear] = useState('2026');
   const [selectedMonth, setSelectedMonth] = useState('Sep');
@@ -29,7 +24,7 @@ export function ExpenseAnalyticsPage({ transactions }: ExpenseAnalyticsPageProps
     let list = transactions;
 
     if (selectedYear !== 'All') {
-      list = list.filter((t) => t.date.includes(selectedYear));
+      list = list.filter((t) => t.date.includes(selectedYear) || t.date === 'Today' || t.date.startsWith('2026'));
     }
 
     if (selectedMonth !== 'All' && MONTH_MAP[selectedMonth]) {
@@ -77,41 +72,46 @@ export function ExpenseAnalyticsPage({ transactions }: ExpenseAnalyticsPageProps
     paddingBottom: safeAreaInsets.bottom + 100,
   };
 
+  const bgClass = themeMode === 'lights-out' ? 'bg-black' : 'bg-slate-950';
+
   return (
     <ScrollView
-      className="flex-1 bg-slate-950"
+      className={`flex-1 ${bgClass}`}
       contentContainerStyle={[{ paddingHorizontal: 20 }, containerPadding]}
       showsVerticalScrollIndicator={false}>
-      <View className="flex-row items-center gap-2.5 mb-6">
-        <View className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 items-center justify-center">
-          <Ionicons name="pie-chart-outline" size={20} color="#34D399" />
+      <View className="flex-row justify-between items-center mb-6">
+        <View className="flex-row items-center gap-2.5">
+          <View className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 items-center justify-center">
+            <Ionicons name="pie-chart-outline" size={20} color="#34D399" />
+          </View>
+          <View>
+            <Text className="text-[24px] font-bold text-white tracking-tight">Expense Analytics</Text>
+            <Text className="text-[13px] text-slate-400 font-normal">Calculate expenses by month & year</Text>
+          </View>
         </View>
-        <View>
-          <Text className="text-[24px] font-bold text-white tracking-tight">Expense Analytics</Text>
-          <Text className="text-[13px] text-slate-400 font-normal">Calculate expenses by month & year</Text>
+        <View className="flex-row items-center gap-2">
+          {onOpenRolloverModal && (
+            <Pressable
+              onPress={onOpenRolloverModal}
+              className="flex-row items-center gap-1.5 bg-amber-500/15 border border-amber-500/30 px-2.5 py-2 rounded-xl active:opacity-80">
+              <Ionicons name="time-outline" size={15} color="#F59E0B" />
+              <Text className="text-xs font-bold text-amber-400">Rollover</Text>
+            </Pressable>
+          )}
+          {onSetMonthlyBudget && (
+            <Pressable
+              onPress={onSetMonthlyBudget}
+              className="flex-row items-center gap-1.5 bg-emerald-500/15 border border-emerald-500/30 px-3 py-2 rounded-xl active:opacity-80">
+              <Ionicons name="wallet-outline" size={15} color="#34D399" />
+              <Text className="text-xs font-bold text-emerald-400">Budget</Text>
+            </Pressable>
+          )}
         </View>
       </View>
 
-      <PeriodSelector
-        selectedYear={selectedYear}
-        onSelectYear={setSelectedYear}
-        selectedMonth={selectedMonth}
-        onSelectMonth={setSelectedMonth}
-      />
-
-      <ExpenseSummaryCard
-        totalExpenses={filteredData.totalExpenses}
-        totalIncome={filteredData.totalIncome}
-        transactionCount={filteredData.filteredTransactions.length}
-        month={selectedMonth}
-        year={selectedYear}
-      />
-
-      <YearlyInsightCard
-        categoryList={filteredData.categoryList}
-        totalExpenses={filteredData.totalExpenses}
-        year={selectedYear}
-      />
+      <PeriodSelector selectedYear={selectedYear} onSelectYear={setSelectedYear} selectedMonth={selectedMonth} onSelectMonth={setSelectedMonth} />
+      <ExpenseSummaryCard totalExpenses={filteredData.totalExpenses} totalIncome={filteredData.totalIncome} transactionCount={filteredData.filteredTransactions.length} month={selectedMonth} year={selectedYear} monthlyBudget={monthlyBudget} onSetMonthlyBudget={onSetMonthlyBudget} />
+      <YearlyInsightCard categoryList={filteredData.categoryList} totalExpenses={filteredData.totalExpenses} year={selectedYear} />
 
       {filteredData.categoryList.length > 0 && (
         <View className="mb-8">
@@ -136,7 +136,7 @@ export function ExpenseAnalyticsPage({ transactions }: ExpenseAnalyticsPageProps
       )}
 
       {/* Day-by-Day Expenses Breakdown */}
-      <DayByDayExpensesList dayGroups={filteredData.dayGroups} />
+      <DayByDayExpensesList dayGroups={filteredData.dayGroups} onDeleteTransaction={onDeleteTransaction} />
     </ScrollView>
   );
 }

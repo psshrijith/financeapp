@@ -12,6 +12,9 @@ import { MorePage } from '../more/more-page';
 import { CategoryManagerModal } from '../categories/category-manager-modal';
 import { AddAccountModal } from '../net-worth/add-account-modal';
 import { SetBudgetModal } from '../more/set-budget-modal';
+import { ThemeModal } from '../more/theme-modal';
+import { PasscodeLockOverlay } from '../passcode/passcode-lock-overlay';
+import { UnspentRolloverModal } from './unspent-rollover-modal';
 
 export function LandingPage() {
   const safeAreaInsets = useSafeAreaInsets();
@@ -23,15 +26,29 @@ export function LandingPage() {
     paddingBottom: safeAreaInsets.bottom + 95,
   };
 
+  const handlePressAdd = () => {
+    state.setIsAddModalVisible(true);
+  };
+
+  const bgClass = state.themeMode === 'lights-out' ? 'bg-black' : 'bg-slate-950';
+
   return (
-    <View className="flex-1 bg-slate-950 relative">
+    <View className={`flex-1 ${bgClass} relative`}>
       {activeTab === 'expenses' ? (
-        <ExpenseAnalyticsPage transactions={state.activeTransactions} />
+        <ExpenseAnalyticsPage
+          transactions={state.activeTransactions}
+          monthlyBudget={state.monthlyBudget}
+          onSetMonthlyBudget={() => state.setIsSetBudgetModalVisible(true)}
+          onOpenRolloverModal={() => state.setIsRolloverModalVisible(true)}
+          onDeleteTransaction={state.handleDeleteTransaction}
+          themeMode={state.themeMode}
+        />
       ) : activeTab === 'networth' ? (
         <NetWorthPage
           userAccounts={state.userAccounts}
           onOpenAddAccountModal={() => state.setIsAddAccountModalVisible(true)}
           onDeleteAccount={state.handleDeleteAccount}
+          themeMode={state.themeMode}
         />
       ) : activeTab === 'more' ? (
         <MorePage
@@ -45,6 +62,9 @@ export function LandingPage() {
           onSetMonthlyBudget={() => state.setIsSetBudgetModalVisible(true)}
           monthlyBudget={state.monthlyBudget}
           isRestored={state.isRestored}
+          themeMode={state.themeMode}
+          onOpenThemeModal={() => state.setIsThemeModalVisible(true)}
+          onLockApp={() => state.handleLockApp()}
         />
       ) : (
         <HomeView
@@ -54,13 +74,27 @@ export function LandingPage() {
           showCategorySplit={state.showCategorySplit}
           activeTransactions={state.activeTransactions}
           categories={state.useDemoData ? undefined : state.userCategories}
+          onDeleteTransaction={state.handleDeleteTransaction}
         />
       )}
 
       <BottomNavigation
         activeTab={activeTab}
         onTabChange={setActiveTab}
-        onPressAdd={() => state.setIsAddModalVisible(true)}
+        onPressAdd={handlePressAdd}
+      />
+
+      <PasscodeLockOverlay
+        visible={state.isAppLocked}
+        themeMode={state.themeMode}
+        onUnlock={state.handleUnlockApp}
+      />
+
+      <ThemeModal
+        visible={state.isThemeModalVisible}
+        activeTheme={state.themeMode}
+        onClose={() => state.setIsThemeModalVisible(false)}
+        onSelectTheme={state.setThemeMode}
       />
 
       <AddTransactionModal
@@ -88,6 +122,16 @@ export function LandingPage() {
         currentBudget={state.monthlyBudget}
         onClose={() => state.setIsSetBudgetModalVisible(false)}
         onSaveBudget={state.handleSaveMonthlyBudget}
+      />
+
+      <UnspentRolloverModal
+        visible={state.isRolloverModalVisible}
+        unspentAmount={state.unspentAmount}
+        monthName="Current Month"
+        themeMode={state.themeMode}
+        onRolloverToNextMonth={state.handleRolloverToBudget}
+        onMoveToSavings={state.handleMoveToSavings}
+        onDismiss={() => state.setIsRolloverModalVisible(false)}
       />
     </View>
   );

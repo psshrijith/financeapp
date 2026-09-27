@@ -37,6 +37,9 @@ export function NetWorthInsights({ userAccounts, assetsSum }: NetWorthInsightsPr
 
   const liquidAssets = (typeMap['bank']?.amount || 0) + (typeMap['cash']?.amount || 0);
   const liquidPct = assetsSum > 0 ? Math.round((liquidAssets / assetsSum) * 100) : 0;
+  const investmentAssets = typeMap['investment']?.amount || 0;
+  const investmentPct = assetsSum > 0 ? Math.round((investmentAssets / assetsSum) * 100) : 0;
+  const topAsset = typeContributions[0];
 
   return (
     <View className="mb-8 gap-4">
@@ -77,16 +80,42 @@ export function NetWorthInsights({ userAccounts, assetsSum }: NetWorthInsightsPr
       </View>
 
       {/* 2. Key Insights Summary */}
-      <View className="bg-slate-900/60 border border-slate-800/60 rounded-2xl p-4">
-        <Text className="text-[14px] font-semibold text-white mb-3">💡 Financial Insights</Text>
-        <View className="gap-2.5">
-          <View className="flex-row items-center justify-between">
-            <Text className="text-xs text-slate-400">Liquid Accessibility Ratio</Text>
-            <Text className="text-xs font-bold text-emerald-400">{liquidPct}% in Cash/Bank</Text>
+      <View className="bg-slate-900/60 border border-slate-800/60 rounded-2xl p-4 gap-3">
+        <Text className="text-[15px] font-bold text-white mb-1">💡 Net Worth Insights</Text>
+
+        <View className="flex-row items-start gap-2.5 bg-slate-950/40 p-3 rounded-xl border border-slate-800/40">
+          <Text className="text-lg">💧</Text>
+          <View className="flex-1">
+            <Text className="text-[13px] font-bold text-emerald-400">Liquidity Health: {liquidPct}%</Text>
+            <Text className="text-[12px] text-slate-400 mt-0.5">
+              {liquidPct >= 40
+                ? `${liquidPct}% of your wealth is in cash & bank accounts for instant access.`
+                : `${liquidPct}% is liquid. Consider keeping 3-6 months of expenses accessible.`}
+            </Text>
           </View>
-          <View className="flex-row items-center justify-between">
-            <Text className="text-xs text-slate-400">Active Accounts</Text>
-            <Text className="text-xs font-bold text-white">{userAccounts.length} Total Accounts</Text>
+        </View>
+
+        {topAsset && (
+          <View className="flex-row items-start gap-2.5 bg-slate-950/40 p-3 rounded-xl border border-slate-800/40">
+            <Text className="text-lg">👑</Text>
+            <View className="flex-1">
+              <Text className="text-[13px] font-bold text-amber-400">Top Asset Class: {topAsset.label}</Text>
+              <Text className="text-[12px] text-slate-400 mt-0.5">
+                {topAsset.label} makes up {topAsset.pct}% of your total asset portfolio (₹{topAsset.amount.toLocaleString('en-IN')}).
+              </Text>
+            </View>
+          </View>
+        )}
+
+        <View className="flex-row items-start gap-2.5 bg-slate-950/40 p-3 rounded-xl border border-slate-800/40">
+          <Text className="text-lg">🛡️</Text>
+          <View className="flex-1">
+            <Text className="text-[13px] font-bold text-purple-400">Investment Growth Ratio: {investmentPct}%</Text>
+            <Text className="text-[12px] text-slate-400 mt-0.5">
+              {investmentPct > 0
+                ? `${investmentPct}% allocated to high-growth instruments (Mutual Funds & Fixed Deposits).`
+                : 'No long-term investment accounts added yet. Tap + Add Account to track mutual funds & FDs.'}
+            </Text>
           </View>
         </View>
       </View>
