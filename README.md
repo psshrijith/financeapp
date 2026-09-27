@@ -1,76 +1,64 @@
-# 🟢 Finance Pro
+# 🟢 Finance Pro - App Feature Guide
 
-A modern, ultra-fast mobile personal finance assistant built with **React Native**, **Expo Router**, **NativeWind (Tailwind CSS)**, and **TypeScript**.
-
----
-
-## ✨ Key Features
-
-- 📅 **Real-Time Monthly Dashboard**: Tracks net balance, monthly income, expenses, savings rate, and recent transactions.
-- 📊 **Multi-Year Analytics**: Filter expenses by month & year with category spending percentage breakdowns.
-- 👑 **Annual Insights**: Top expense category highlights and horizontal progress bar graphs.
-- 📂 **Backup Restoration**: Import Android SQLite & JSON backup files via `expo-document-picker`.
-- 🏷️ **Custom Categories**: Add or remove custom expense categories with custom emojis.
-- 💎 **Net Worth Tracking**: Monitor liquid cash, fixed deposits, mutual funds, and emergency reserves.
-- 🎨 **Modern Mobile UI**: Emerald Green theme (`#10B981`), floating rounded bottom bar, and smooth modal transitions.
+A detailed breakdown of all features, pages, analytics tools, data restoration utilities, and category management capabilities built into **Finance Pro**.
 
 ---
 
-## 🛠️ Tech Stack
+## 📱 Detailed App Features
 
-- **Framework**: Expo (SDK 57) / React Native
-- **Routing**: Expo Router (`src/app/`)
-- **Styling**: NativeWind v4 (Tailwind CSS)
-- **Language**: TypeScript (`strict: true`)
-- **Testing**: Jest (`npx jest`)
-- **CI/CD**: GitHub Actions (4-stage pipeline)
-
----
-
-## ⚡ Quick Commands
-
-```bash
-# Start development server
-npx expo start
-
-# Typecheck TypeScript
-npx tsc --noEmit
-
-# Run Unit Tests
-npm test
-
-# Run Lint Check
-npm run lint
-```
+### 1. 📅 Real-Time Monthly Cash Flow Dashboard (`Overview`)
+- **Time-Aware Dynamic Greeting**: Header automatically evaluates local device time to display `Good morning 👋`, `Good afternoon 👋`, or `Good evening 👋`.
+- **Cumulative Net Balance**: Displays total net balance (total earnings minus total expenses) across all recorded transactions.
+- **Current Active Month Breakdown**:
+  - **Monthly Income**: Total earnings credited during the active month.
+  - **Monthly Expenses**: Total outgoing expenses incurred during the active month.
+  - **Monthly Saved Amount**: Net positive savings (`Income - Expenses`).
+  - **Savings Rate Percentage**: Automatically calculates savings percentage `(Saved Amount / Income) * 100%`.
+- **Active Month Category Spending**: Shows category expense totals and progress bars strictly for the active month (e.g. 🏠 Rent, 🏍️ Bike, 🛒 Groceries).
+- **Recent Transactions Timeline**: Real-time list of recent income and expense records sorted by date.
 
 ---
 
-## 📱 EAS Cloud Build Commands
-
-```bash
-# Build Android Preview APK (Direct Install on Phone)
-npx eas-cli@latest build --platform android --profile preview
-
-# Build Android Production Bundle (.aab for Google Play)
-npx eas-cli@latest build --platform android --profile production
-
-# Build iOS App
-npx eas-cli@latest build --platform ios --profile production
-```
+### 2. 📊 Multi-Year Expense Analytics (`Expenses`)
+- **Period Filter Dropdowns**:
+  - **Year Selector**: Filter by `2026`, `2025`, `2024`, `2023`, or `All Years`.
+  - **Month Selector**: Filter by `Jan` through `Dec` or `All Months`.
+- **Dynamic Timeframe Recalculation**: Automatically recalculates total income, total expenses, transaction counts, and category percentage contributions for any selected timeframe.
+- **Top Expense Highlight Card**: Identifies your #1 highest expense category for the selected year (e.g., *"👑 Top Expense: 🏠 Rent accounted for 48% of spending"*).
+- **Category Progress Bar Graphs**: Visual horizontal progress bars comparing spending percentages across all categories.
 
 ---
 
-## ⚙️ GitHub Actions CI Pipeline Order
-
-The repository executes 4 sequential stages on every push / pull request:
-
-1. `1. Linting` (`npx expo lint`)
-2. `2. Typecheck` (`npx tsc --noEmit`)
-3. `3. Unit Tests` (`npm test`)
-4. `4. Production Build` (`npx expo export --platform android`)
+### 3. 💎 Net Worth & Asset Tracking (`Net Worth`)
+- **Net Worth Summary**: Combines liquid balances, long-term investments, and emergency reserves into a unified net worth figure.
+- **Asset Allocation Breakdown**:
+  - **Liquid Cash & Bank Accounts**: Everyday spending and operating cash.
+  - **Fixed Deposits & Mutual Funds**: Growth investments and long-term funds.
+  - **Emergency Reserve**: Allocated liquid reserve funds.
 
 ---
 
-## 📄 License
+### 4. 🏷️ Category Management (`More` ➔ `Manage Categories`)
+- **14 Pre-Loaded Restored Categories**: Includes `Food`, `Bills`, `Vegetables`, `Groceries`, `Purchases`, `Bike`, `Rent`, `Fruits`, `Transport`, `Travels`, `Savings`, `Sports`, `Hair Treatment`, and `games`.
+- **Add Custom Category**: Enter category title and select custom emojis (e.g. 📺 Subscriptions, 🏋️ Gym, ☕ Coffee).
+- **Delete Category**: Remove unwanted categories with one tap.
+- **App-Wide Sync**: Newly created or deleted categories update across transaction creation forms, category pickers, and expense analytics.
 
-MIT
+---
+
+### 5. 📂 Backup Data Restoration & Document Import (`More`)
+- **2,916 Historical Transactions**: Pre-loaded with restored SQLite backup transactions totaling **₹9,42,518.00** in income and **₹6,62,014.90** in expenses.
+- **Device Document Upload**: Built-in file picker (`expo-document-picker`) to import `.json` or `.db` backup files directly from local storage or cloud drives.
+- **Demo Data Toggle**: Instantly switch between real restored financial data and sample demo data.
+
+---
+
+### 6. ➕ Add Transaction Modal
+- **Quick Entry**: Add new Income or Expense entries with Title, Amount, Category, and Emoji.
+- **Floating Action Button**: Non-overlapping elevated Add button resting above the floating bottom navigation bar.
+
+---
+
+### 7. 🎨 Mobile Design System
+- **Emerald Green Theme**: Styled with primary accent `#10B981` on dark slate background (`#090D16`).
+- **Floating Bottom Bar**: Ultra-rounded navigation bar with tab switching between Overview, Expenses, Net Worth, and More.
