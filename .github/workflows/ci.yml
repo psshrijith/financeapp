@@ -1,4 +1,4 @@
-name: Build & CI Workflow
+name: Main Sequential CI Workflow
 
 on:
   push:
@@ -7,10 +7,31 @@ on:
     branches: [ main, master ]
 
 jobs:
-  build:
-    name: Typecheck & Build Test
+  linting:
+    name: 1. Linting
     runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Expo linting
+        env:
+          EXPO_NO_TELEMETRY: 1
+        run: npx expo lint
+
+  typecheck:
+    name: 2. Typecheck
+    needs: linting
+    runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -27,5 +48,22 @@ jobs:
       - name: Run TypeScript typecheck
         run: npx tsc --noEmit
 
-      - name: Run Expo linting
-        run: npx expo lint
+  unit_tests:
+    name: 3. Unit Tests
+    needs: typecheck
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Jest unit tests
+        run: npm test
