@@ -1,64 +1,63 @@
 # 🟢 Finance Pro - App Feature Guide
 
-A detailed breakdown of all features, pages, analytics tools, data restoration utilities, and category management capabilities built into **Finance Pro**.
+A clean breakdown of all core features, analytical tools, category management, and backup import capabilities in **Finance Pro**.
 
 ---
 
-## 📱 Detailed App Features
+## 📱 Core App Features
 
 ### 1. 📅 Real-Time Monthly Cash Flow Dashboard (`Overview`)
-- **Time-Aware Dynamic Greeting**: Header automatically evaluates local device time to display `Good morning 👋`, `Good afternoon 👋`, or `Good evening 👋`.
-- **Cumulative Net Balance**: Displays total net balance (total earnings minus total expenses) across all recorded transactions.
-- **Current Active Month Breakdown**:
-  - **Monthly Income**: Total earnings credited during the active month.
-  - **Monthly Expenses**: Total outgoing expenses incurred during the active month.
-  - **Monthly Saved Amount**: Net positive savings (`Income - Expenses`).
-  - **Savings Rate Percentage**: Automatically calculates savings percentage `(Saved Amount / Income) * 100%`.
-- **Active Month Category Spending**: Shows category expense totals and progress bars strictly for the active month (e.g. 🏠 Rent, 🏍️ Bike, 🛒 Groceries).
-- **Recent Transactions Timeline**: Real-time list of recent income and expense records sorted by date.
+- **Dynamic Time-Aware Greeting**: Automatically displays `Good morning 👋`, `Good afternoon 👋`, or `Good evening 👋` based on local device time.
+- **Net Cash Balance**: Calculates real-time total net balance (total income minus total expenses) across recorded transactions.
+- **Active Month Performance**:
+  - **Monthly Income**: Earnings credited during the active month.
+  - **Monthly Expenses**: Outgoing expenses incurred during the active month.
+  - **Monthly Savings**: Net positive savings (`Income - Expenses`).
+  - **Savings Rate Percentage**: Automatically calculates active month savings percentage `(Savings / Income) * 100%`.
+- **Monthly Category Breakdown**: Displays category spending totals and visual progress bars strictly for the active month.
+- **Recent Transactions Timeline**: Real-time list of recent income and expense transactions sorted by date.
 
 ---
 
 ### 2. 📊 Multi-Year Expense Analytics (`Expenses`)
-- **Period Filter Dropdowns**:
-  - **Year Selector**: Filter by `2026`, `2025`, `2024`, `2023`, or `All Years`.
-  - **Month Selector**: Filter by `Jan` through `Dec` or `All Months`.
-- **Dynamic Timeframe Recalculation**: Automatically recalculates total income, total expenses, transaction counts, and category percentage contributions for any selected timeframe.
-- **Top Expense Highlight Card**: Identifies your #1 highest expense category for the selected year (e.g., *"👑 Top Expense: 🏠 Rent accounted for 48% of spending"*).
+- **Period Filter Selectors**:
+  - **Year Filter**: Select specific years or view `All Years`.
+  - **Month Filter**: Select specific months (`Jan` - `Dec`) or view `All Months`.
+- **Dynamic Timeframe Calculations**: Instantly recalculates total income, expenses, transaction counts, and category percentage contributions for any selected period.
+- **Top Expense Highlight Banner**: Automatically identifies your highest expense category and percentage contribution for the selected period.
 - **Category Progress Bar Graphs**: Visual horizontal progress bars comparing spending percentages across all categories.
 
 ---
 
 ### 3. 💎 Net Worth & Asset Tracking (`Net Worth`)
-- **Net Worth Summary**: Combines liquid balances, long-term investments, and emergency reserves into a unified net worth figure.
+- **Total Net Worth Summary**: Combines liquid accounts, long-term investments, and reserves into a unified net worth total.
 - **Asset Allocation Breakdown**:
-  - **Liquid Cash & Bank Accounts**: Everyday spending and operating cash.
+  - **Liquid Cash & Savings**: Everyday operating and bank account balances.
   - **Fixed Deposits & Mutual Funds**: Growth investments and long-term funds.
-  - **Emergency Reserve**: Allocated liquid reserve funds.
+  - **Emergency Reserve**: Allocated reserve funds.
 
 ---
 
-### 4. 🏷️ Category Management (`More` ➔ `Manage Categories`)
-- **14 Pre-Loaded Restored Categories**: Includes `Food`, `Bills`, `Vegetables`, `Groceries`, `Purchases`, `Bike`, `Rent`, `Fruits`, `Transport`, `Travels`, `Savings`, `Sports`, `Hair Treatment`, and `games`.
-- **Add Custom Category**: Enter category title and select custom emojis (e.g. 📺 Subscriptions, 🏋️ Gym, ☕ Coffee).
+### 4. 🏷️ Custom Category Management (`More` ➔ `Manage Categories`)
+- **Pre-Loaded Categories**: Default category structures (e.g. `Food`, `Bills`, `Groceries`, `Rent`, `Transport`, `Travels`, `Savings`).
+- **Add Custom Category**: Enter category title and pick a custom emoji.
 - **Delete Category**: Remove unwanted categories with one tap.
-- **App-Wide Sync**: Newly created or deleted categories update across transaction creation forms, category pickers, and expense analytics.
+- **App-Wide Propagation**: Custom categories automatically update transaction creation forms, category selectors, and expense analytics breakdowns.
 
 ---
 
-### 5. 📂 Backup Data Restoration & Document Import (`More`)
-- **2,916 Historical Transactions**: Pre-loaded with restored SQLite backup transactions totaling **₹9,42,518.00** in income and **₹6,62,014.90** in expenses.
-- **Device Document Upload**: Built-in file picker (`expo-document-picker`) to import `.json` or `.db` backup files directly from local storage or cloud drives.
-- **Demo Data Toggle**: Instantly switch between real restored financial data and sample demo data.
+### 5. 📂 Backup File Import (`More`)
+- **Device Document Import**: Built-in file picker (`expo-document-picker`) to import `.json` or `.db` financial backup files directly from local storage or cloud drives.
+- **Demo Data Toggle**: Switch demo mode on/off to preview sample data or test clean app states.
 
 ---
 
 ### 6. ➕ Add Transaction Modal
-- **Quick Entry**: Add new Income or Expense entries with Title, Amount, Category, and Emoji.
-- **Floating Action Button**: Non-overlapping elevated Add button resting above the floating bottom navigation bar.
+- **Quick Record Entry**: Record new Income or Expense entries with Title, Amount, Category, and Emoji.
+- **Elevated Action Button**: Non-overlapping floating action button positioned above the navigation bar.
 
 ---
 
 ### 7. 🎨 Mobile Design System
 - **Emerald Green Theme**: Styled with primary accent `#10B981` on dark slate background (`#090D16`).
-- **Floating Bottom Bar**: Ultra-rounded navigation bar with tab switching between Overview, Expenses, Net Worth, and More.
+- **Floating Bottom Bar**: Ultra-rounded navigation bar for seamless tab switching between Overview, Expenses, Net Worth, and More.
