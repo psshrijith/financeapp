@@ -28,7 +28,7 @@ export function useFinanceAppState() {
 
   const [managedCategories, setManagedCategories] = useState<CategoryItem[]>(BACKUP_CATEGORIES);
   const [userTransactions, setUserTransactions] = useState<Transaction[]>(RESTORED_TRANSACTIONS);
-  const [userSnapshot, setUserSnapshot] = useState(RESTORED_SNAPSHOT);
+  const [, setUserSnapshot] = useState(RESTORED_SNAPSHOT);
   const [userCategories, setUserCategories] = useState<SpendingCategory[]>(RESTORED_CATEGORIES);
 
   const monthStats = calculateCurrentMonthStats(userTransactions);
