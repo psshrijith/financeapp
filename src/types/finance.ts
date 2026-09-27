@@ -17,17 +17,49 @@ export interface Transaction {
 export interface SpendingCategory {
   id: string;
   name: string;
-  emoji: string;
   amount: number;
-  percentage: number; // e.g. 23 for 23%
-  color: string;
+  ofBudget: number;
+  percentage: number;
+  emoji?: string;
+  changePercent?: number;
+  changePercentage?: string;
+  changeDirection?: 'up' | 'down';
+  budgetString?: string;
+  progressLineColor?: string;
 }
+
 
 export interface FinancialInsight {
   title: string;
   highlightText: string;
   amount: number;
+  totalBudget: number;
+  daysLeft: number;
   percentageChange: number;
-  comparePeriod: string;
-  budgetMessage?: string;
 }
+
+export interface UpcomingBill {
+  id: string;
+  title: string;
+  amount: number;
+  dueDateText: string;
+}
+
+export interface NetWorthBreakdownItem {
+  id: string;
+  name: string;
+  category: string;
+  amount: number;
+  percentageOfAssets: string;
+  dotColor: string;
+  isLiability?: boolean;
+}
+
+export interface NetWorthData {
+  totalNetWorth: number;
+  monthlyChange: number;
+  assets: number;
+  liabilities: number;
+  breakdown: NetWorthBreakdownItem[];
+}
+

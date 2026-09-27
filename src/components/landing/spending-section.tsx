@@ -1,98 +1,68 @@
 import React from 'react';
 import { View, Text, Pressable } from 'react-native';
-import Svg, { Circle, G } from 'react-native-svg';
-
-import {
-  DUMMY_SPENDING_CATEGORIES,
-  DUMMY_SPENDING_TOTAL,
-} from '@/data/dummy-finance-data';
+import { DUMMY_SPENDING_CATEGORIES } from '@/data/dummy-finance-data';
 
 export function SpendingSection() {
-  const size = 125;
-  const strokeWidth = 12;
-  const radius = (size - strokeWidth) / 2;
-  const circumference = 2 * Math.PI * radius;
-
-  // Calculate arc offsets for segments
-  let cumulativePercent = 0;
-
   return (
-    <View className="mb-7">
+    <View className="mb-8">
       {/* Section Header */}
-      <View className="flex-row justify-between items-center mb-3">
-        <Text className="text-[19px] font-bold text-white tracking-tight">
-          Spending
+      <View className="flex-row justify-between items-center mb-4">
+        <Text className="text-[17px] font-semibold text-white tracking-tight">
+          Spending by category
         </Text>
         <Pressable className="active:opacity-70">
-          <Text className="text-[14px] font-semibold text-indigo-400">
+          <Text className="text-[13px] font-medium text-slate-400">
             See all →
           </Text>
         </Pressable>
       </View>
 
-      {/* Side-by-Side Two-Column Layout (Donut LEFT + Categories RIGHT) */}
-      <View className="flex-row items-center justify-between">
-        {/* LEFT COLUMN: 125px Compact Donut Chart */}
-        <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
-          <Svg width={size} height={size}>
-            <G transform={`rotate(-90 ${size / 2} ${size / 2})`}>
-              {DUMMY_SPENDING_CATEGORIES.map((cat) => {
-                const strokeDasharray = `${(cat.percentage / 100) * circumference} ${circumference}`;
-                const strokeDashoffset = -((cumulativePercent / 100) * circumference);
-                cumulativePercent += cat.percentage;
+      {/* Cardless Category List */}
+      <View className="space-y-4">
+        {DUMMY_SPENDING_CATEGORIES.map((cat, index) => {
+          const isIncrease = cat.changePercentage?.startsWith('↑');
+          return (
+            <View key={cat.id}>
+              {index > 0 && <View className="h-px bg-slate-800/40 my-3" />}
+              <Pressable className="flex-row justify-between items-start active:opacity-70">
+                {/* Left: Emoji + Category Name + Budget String */}
+                <View className="flex-1">
+                  <View className="flex-row items-center gap-2 mb-1">
+                    <Text className="text-[15px]">{cat.emoji}</Text>
+                    <Text className="text-[15px] font-semibold text-white">
+                      {cat.name}
+                    </Text>
+                    {cat.changePercentage && (
+                      <Text
+                        className={`text-[12px] font-medium ml-1 ${
+                          isIncrease ? 'text-amber-400' : 'text-emerald-400'
+                        }`}
+                      >
+                        {cat.changePercentage}
+                      </Text>
+                    )}
+                  </View>
 
-                return (
-                  <Circle
-                    key={cat.id}
-                    cx={size / 2}
-                    cy={size / 2}
-                    r={radius}
-                    stroke={cat.color}
-                    strokeWidth={strokeWidth}
-                    strokeDasharray={strokeDasharray}
-                    strokeDashoffset={strokeDashoffset}
-                    strokeLinecap="round"
-                    fill="none"
-                  />
-                );
-              })}
-            </G>
-          </Svg>
+                  <Text className="text-[12px] text-slate-400 font-normal">
+                    {cat.budgetString || `of ₹${(cat.amount * 1.3).toFixed(0)} budget · ${cat.percentage}%`}
+                  </Text>
+                </View>
 
-          {/* Center Total Text */}
-          <View className="absolute items-center justify-center">
-            <Text className="text-[15px] font-extrabold text-white">
-              ₹{DUMMY_SPENDING_TOTAL.toLocaleString('en-IN')}
-            </Text>
-            <Text className="text-[11px] text-slate-400 font-medium">
-              spent
-            </Text>
-          </View>
-        </View>
-
-        {/* RIGHT COLUMN: 4 Compact Category Rows (48–56px high) */}
-        <View className="flex-1 pl-4 gap-1">
-          {DUMMY_SPENDING_CATEGORIES.map((cat) => (
-            <Pressable
-              key={cat.id}
-              className="flex-row justify-between items-center h-[42px] active:opacity-70">
-              <View className="flex-row items-center gap-2">
-                <Text className="text-[15px]">{cat.emoji}</Text>
-                <Text className="text-[15px] font-semibold text-slate-100">
-                  {cat.name}
-                </Text>
-              </View>
-
-              <Text className="text-[14px] font-semibold text-slate-200">
-                ₹{cat.amount.toLocaleString('en-IN')}{' '}
-                <Text className="text-[13px] text-slate-400 font-normal">
-                  · {cat.percentage}%
-                </Text>
-              </Text>
-            </Pressable>
-          ))}
-        </View>
+                {/* Right: Amount */}
+                <View className="items-end">
+                  <Text className="text-[16px] font-bold text-white">
+                    ₹{cat.amount.toLocaleString('en-IN')}
+                  </Text>
+                  <Text className="text-[12px] text-slate-400 mt-0.5 font-medium">
+                    {cat.percentage}% of total
+                  </Text>
+                </View>
+              </Pressable>
+            </View>
+          );
+        })}
       </View>
     </View>
   );
 }
+

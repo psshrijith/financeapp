@@ -3,15 +3,31 @@ import { View, Text, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 
-type TabType = 'home' | 'transactions' | 'goals' | 'more';
+export type TabType = 'home' | 'transactions' | 'networth' | 'more';
 
 interface BottomNavigationProps {
+  activeTab?: TabType;
+  onTabChange?: (tab: TabType) => void;
   onPressAdd?: () => void;
 }
 
-export function BottomNavigation({ onPressAdd }: BottomNavigationProps) {
+export function BottomNavigation({
+  activeTab: controlledActiveTab,
+  onTabChange,
+  onPressAdd,
+}: BottomNavigationProps) {
   const insets = useSafeAreaInsets();
-  const [activeTab, setActiveTab] = useState<TabType>('home');
+  const [internalTab, setInternalTab] = useState<TabType>('home');
+
+  const activeTab = controlledActiveTab ?? internalTab;
+
+  const handleTabPress = (tab: TabType) => {
+    if (onTabChange) {
+      onTabChange(tab);
+    } else {
+      setInternalTab(tab);
+    }
+  };
 
   return (
     <View
@@ -23,9 +39,9 @@ export function BottomNavigation({ onPressAdd }: BottomNavigationProps) {
         <Pressable
           onPress={onPressAdd}
           accessibilityLabel="Add New Transaction"
-          className="flex-row items-center gap-2 bg-indigo-600 px-5 py-3 rounded-full shadow-xl shadow-indigo-600/60 border-2 border-slate-950 active:scale-95">
-          <Ionicons name="add-circle" size={22} color="#FFFFFF" />
-          <Text className="text-white text-sm font-extrabold tracking-wide">
+          className="flex-row items-center gap-2 bg-emerald-500 px-5 py-3 rounded-full shadow-xl shadow-emerald-500/30 border-2 border-slate-950 active:scale-95">
+          <Ionicons name="add-circle" size={22} color="#042F2E" />
+          <Text className="text-slate-950 text-sm font-bold tracking-wide">
             Add Transaction
           </Text>
         </Pressable>
@@ -35,21 +51,21 @@ export function BottomNavigation({ onPressAdd }: BottomNavigationProps) {
       <View className="bg-slate-900/95 border border-slate-800/90 rounded-3xl shadow-2xl shadow-black/80 flex-row justify-around items-center h-16 px-2 relative pt-2">
         {/* Home Tab */}
         <Pressable
-          onPress={() => setActiveTab('home')}
+          onPress={() => handleTabPress('home')}
           className="flex-1 items-center justify-center h-full active:opacity-80">
           <View
             className={`items-center justify-center px-3 py-1 rounded-full ${
-              activeTab === 'home' ? 'bg-indigo-500/15' : ''
+              activeTab === 'home' ? 'bg-emerald-500/15' : ''
             }`}>
             <Ionicons
               name={activeTab === 'home' ? 'home' : 'home-outline'}
               size={19}
-              color={activeTab === 'home' ? '#818CF8' : '#64748B'}
+              color={activeTab === 'home' ? '#34D399' : '#64748B'}
             />
             <Text
               className={`text-[10px] mt-0.5 ${
                 activeTab === 'home'
-                  ? 'font-bold text-indigo-400'
+                  ? 'font-bold text-emerald-400'
                   : 'font-medium text-slate-400'
               }`}>
               Home
@@ -59,11 +75,11 @@ export function BottomNavigation({ onPressAdd }: BottomNavigationProps) {
 
         {/* Transactions Tab */}
         <Pressable
-          onPress={() => setActiveTab('transactions')}
+          onPress={() => handleTabPress('transactions')}
           className="flex-1 items-center justify-center h-full active:opacity-80">
           <View
             className={`items-center justify-center px-3 py-1 rounded-full ${
-              activeTab === 'transactions' ? 'bg-indigo-500/15' : ''
+              activeTab === 'transactions' ? 'bg-emerald-500/15' : ''
             }`}>
             <Ionicons
               name={
@@ -72,12 +88,12 @@ export function BottomNavigation({ onPressAdd }: BottomNavigationProps) {
                   : 'receipt-outline'
               }
               size={19}
-              color={activeTab === 'transactions' ? '#818CF8' : '#64748B'}
+              color={activeTab === 'transactions' ? '#34D399' : '#64748B'}
             />
             <Text
               className={`text-[10px] mt-0.5 ${
                 activeTab === 'transactions'
-                  ? 'font-bold text-indigo-400'
+                  ? 'font-bold text-emerald-400'
                   : 'font-medium text-slate-400'
               }`}>
               Activity
@@ -88,55 +104,55 @@ export function BottomNavigation({ onPressAdd }: BottomNavigationProps) {
         {/* Spacer for Floating Pill alignment */}
         <View className="w-10" />
 
-        {/* Goals Tab */}
+        {/* Net Worth Tab */}
         <Pressable
-          onPress={() => setActiveTab('goals')}
+          onPress={() => handleTabPress('networth')}
           className="flex-1 items-center justify-center h-full active:opacity-80">
           <View
             className={`items-center justify-center px-3 py-1 rounded-full ${
-              activeTab === 'goals' ? 'bg-indigo-500/15' : ''
+              activeTab === 'networth' ? 'bg-emerald-500/15' : ''
             }`}>
             <Ionicons
               name={
-                activeTab === 'goals'
-                  ? 'compass'
-                  : 'compass-outline'
+                activeTab === 'networth'
+                  ? 'trending-up'
+                  : 'trending-up-outline'
               }
               size={19}
-              color={activeTab === 'goals' ? '#818CF8' : '#64748B'}
+              color={activeTab === 'networth' ? '#34D399' : '#64748B'}
             />
             <Text
               className={`text-[10px] mt-0.5 ${
-                activeTab === 'goals'
-                  ? 'font-bold text-indigo-400'
+                activeTab === 'networth'
+                  ? 'font-bold text-emerald-400'
                   : 'font-medium text-slate-400'
               }`}>
-              Goals
+              Net worth
             </Text>
           </View>
         </Pressable>
 
-        {/* More Tab */}
+        {/* More / Settings Tab */}
         <Pressable
-          onPress={() => setActiveTab('more')}
+          onPress={() => handleTabPress('more')}
           className="flex-1 items-center justify-center h-full active:opacity-80">
           <View
             className={`items-center justify-center px-3 py-1 rounded-full ${
-              activeTab === 'more' ? 'bg-indigo-500/15' : ''
+              activeTab === 'more' ? 'bg-emerald-500/15' : ''
             }`}>
             <Ionicons
               name={
                 activeTab === 'more'
-                  ? 'grid'
-                  : 'grid-outline'
+                  ? 'settings'
+                  : 'settings-outline'
               }
               size={19}
-              color={activeTab === 'more' ? '#818CF8' : '#64748B'}
+              color={activeTab === 'more' ? '#34D399' : '#64748B'}
             />
             <Text
               className={`text-[10px] mt-0.5 ${
                 activeTab === 'more'
-                  ? 'font-bold text-indigo-400'
+                  ? 'font-bold text-emerald-400'
                   : 'font-medium text-slate-400'
               }`}>
               More
@@ -147,3 +163,6 @@ export function BottomNavigation({ onPressAdd }: BottomNavigationProps) {
     </View>
   );
 }
+
+
+

@@ -82,127 +82,145 @@ export function AddTransactionModal({
         className="flex-1 justify-end bg-black/75">
         <Pressable className="flex-1" onPress={onClose} />
 
-        <View className="bg-slate-900 border-t border-slate-800 rounded-t-3xl p-5 shadow-2xl">
+        <View className="bg-[#0E131F] border-t border-slate-800/80 rounded-t-[32px] p-6 shadow-2xl">
+          {/* Top Handle Bar */}
+          <View className="w-10 h-1 bg-slate-700/60 rounded-full self-center mb-4" />
+
           {/* Header */}
-          <View className="flex-row justify-between items-center pb-3 border-b border-slate-800">
-            <Text className="text-lg font-bold text-white">Add Transaction</Text>
+          <View className="flex-row justify-between items-center mb-4">
+            <Text className="text-[20px] font-bold text-white tracking-tight">
+              Add transaction
+            </Text>
             <Pressable
               onPress={onClose}
-              className="w-8 h-8 rounded-full bg-slate-800 items-center justify-center active:opacity-70">
-              <Ionicons name="close" size={18} color="#94A3B8" />
+              className="w-7 h-7 rounded-full bg-slate-800/60 items-center justify-center active:opacity-70">
+              <Ionicons name="close" size={16} color="#94A3B8" />
             </Pressable>
           </View>
 
-          <ScrollView showsVerticalScrollIndicator={false} className="mt-3 gap-3">
-            {/* Error Message Alert Banner */}
+          {/* Segmented Tab Switcher (Expense / Income) */}
+          <View className="flex-row border-b border-slate-800/80 mb-6 gap-6">
+            <Pressable
+              onPress={() => setType('expense')}
+              className={`pb-2.5 ${
+                type === 'expense' ? 'border-b-2 border-emerald-400' : ''
+              }`}>
+              <Text
+                className={`text-[15px] ${
+                  type === 'expense'
+                    ? 'font-bold text-white'
+                    : 'font-medium text-slate-400'
+                }`}>
+                Expense
+              </Text>
+            </Pressable>
+
+            <Pressable
+              onPress={() => setType('income')}
+              className={`pb-2.5 ${
+                type === 'income' ? 'border-b-2 border-emerald-400' : ''
+              }`}>
+              <Text
+                className={`text-[15px] ${
+                  type === 'income'
+                    ? 'font-bold text-white'
+                    : 'font-medium text-slate-400'
+                }`}>
+                Income
+              </Text>
+            </Pressable>
+          </View>
+
+          <ScrollView showsVerticalScrollIndicator={false} className="gap-5">
+            {/* Error Message */}
             {errorMessage ? (
-              <View className="bg-red-500/20 border border-red-500/50 px-3 py-2 rounded-xl mb-1">
+              <View className="bg-red-500/20 border border-red-500/40 px-3 py-2 rounded-xl">
                 <Text className="text-xs font-semibold text-red-400 text-center">
                   ⚠️ {errorMessage}
                 </Text>
               </View>
             ) : null}
 
-            {/* Type Selector (Expense / Income) */}
-            <View className="flex-row bg-slate-950 p-1 rounded-2xl border border-slate-800">
-              <Pressable
-                onPress={() => setType('expense')}
-                className={`flex-1 py-2.5 rounded-xl items-center ${
-                  type === 'expense' ? 'bg-red-500/20 border border-red-500/40' : ''
-                }`}>
-                <Text
-                  className={`text-xs font-bold ${
-                    type === 'expense' ? 'text-red-400' : 'text-slate-400'
-                  }`}>
-                  Expense
-                </Text>
-              </Pressable>
-
-              <Pressable
-                onPress={() => setType('income')}
-                className={`flex-1 py-2.5 rounded-xl items-center ${
-                  type === 'income' ? 'bg-emerald-500/20 border border-emerald-500/40' : ''
-                }`}>
-                <Text
-                  className={`text-xs font-bold ${
-                    type === 'income' ? 'text-emerald-400' : 'text-slate-400'
-                  }`}>
-                  Income
-                </Text>
-              </Pressable>
+            {/* Hero Amount Input */}
+            <View className="flex-row items-center py-2">
+              <Text className="text-[32px] font-normal text-slate-400 mr-2">
+                ₹
+              </Text>
+              <TextInput
+                value={amount}
+                onChangeText={(val) => {
+                  setAmount(val);
+                  if (errorMessage) setErrorMessage('');
+                }}
+                placeholder="0"
+                placeholderTextColor="#64748B"
+                keyboardType="numeric"
+                autoFocus
+                className="text-[38px] font-normal text-white flex-1"
+              />
             </View>
 
-            {/* Amount Display / Input */}
-            <View className="items-center justify-center my-2 bg-slate-950 p-3.5 rounded-2xl border border-slate-800/80">
-              <Text className="text-xs text-slate-400 font-medium mb-1">Enter Amount</Text>
-              <View className="flex-row items-center">
-                <Text className="text-3xl font-black text-indigo-400 mr-1">₹</Text>
-                <TextInput
-                  value={amount}
-                  onChangeText={(val) => {
-                    setAmount(val);
-                    if (errorMessage) setErrorMessage('');
-                  }}
-                  placeholder="0"
-                  placeholderTextColor="#475569"
-                  keyboardType="numeric"
-                  autoFocus
-                  className="text-3xl font-black text-white min-w-[120px] text-center"
-                />
-              </View>
-            </View>
-
-            {/* Title Input */}
-            <View>
-              <Text className="text-xs font-semibold text-slate-400 mb-1">
-                Merchant / Title (Optional)
+            {/* Merchant / Title Input */}
+            <View className="mt-1">
+              <Text className="text-[12px] font-medium text-slate-400 mb-1">
+                Merchant or title
               </Text>
               <TextInput
                 value={title}
                 onChangeText={setTitle}
-                placeholder={`e.g. ${selectedCategory.name}`}
-                placeholderTextColor="#64748B"
-                className="bg-slate-950 text-white p-3 rounded-2xl border border-slate-800 text-sm font-medium"
+                placeholder="e.g. Swiggy"
+                placeholderTextColor="#475569"
+                className="border-b border-slate-800/80 pb-2 text-[15px] font-normal text-white"
               />
             </View>
 
-            {/* Category Selector Chips */}
-            <View>
-              <Text className="text-xs font-semibold text-slate-400 mb-2">Select Category</Text>
-              <View className="flex-row flex-wrap gap-2">
+            {/* Category Selector Pills */}
+            <View className="mt-2">
+              <Text className="text-[12px] font-medium text-slate-400 mb-2.5">
+                Category
+              </Text>
+              <ScrollView
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                className="flex-row">
                 {CATEGORY_OPTIONS.map((cat) => {
                   const isSelected = selectedCategory.id === cat.id;
                   return (
                     <Pressable
                       key={cat.id}
                       onPress={() => setSelectedCategory(cat)}
-                      className={`flex-row items-center gap-1.5 px-3 py-2 rounded-xl border ${
+                      className={`flex-row items-center gap-1.5 px-4 py-2 rounded-full border mr-2.5 ${
                         isSelected
-                          ? 'bg-indigo-600/20 border-indigo-500'
-                          : 'bg-slate-950 border-slate-800'
+                          ? 'border-emerald-400/90 bg-emerald-400/10'
+                          : 'border-slate-800/90 bg-slate-900/40'
                       }`}>
-                      <Text className="text-sm">{cat.emoji}</Text>
+                      <Text className="text-[14px]">{cat.emoji}</Text>
                       <Text
-                        className={`text-xs font-semibold ${
-                          isSelected ? 'text-indigo-300' : 'text-slate-300'
+                        className={`text-[13px] font-medium ${
+                          isSelected ? 'text-white font-semibold' : 'text-slate-300'
                         }`}>
                         {cat.name}
                       </Text>
                     </Pressable>
                   );
                 })}
-              </View>
+              </ScrollView>
             </View>
 
-            {/* Save Button */}
+            {/* Save Transaction Button */}
             <Pressable
               onPress={handleSubmit}
-              className="bg-indigo-600 py-3.5 rounded-2xl items-center active:bg-indigo-700 mt-2 mb-2 shadow-lg shadow-indigo-600/30">
-              <Text className="text-white font-bold text-base">Save Transaction</Text>
+              className="bg-emerald-500 py-3.5 rounded-2xl items-center active:opacity-90 mt-4 mb-2">
+              <Text className="text-slate-950 font-bold text-[16px]">
+                Save transaction
+              </Text>
             </Pressable>
+
+
           </ScrollView>
         </View>
       </KeyboardAvoidingView>
     </Modal>
   );
 }
+
