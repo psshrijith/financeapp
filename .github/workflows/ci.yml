@@ -23,12 +23,34 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run ESLint
-        run: npm run lint
+      - name: Run Expo Linting
+        env:
+          EXPO_NO_TELEMETRY: 1
+        run: npx expo lint
 
-  unit_tests:
-    name: 2. Unit Tests
+  typecheck:
+    name: 2. Typecheck
     needs: linting
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run TypeScript typecheck
+        run: npx tsc --noEmit
+
+  tests:
+    name: 3. Unit Tests
+    needs: typecheck
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -47,8 +69,8 @@ jobs:
         run: npm test
 
   build:
-    name: 3. Typecheck & Build
-    needs: unit_tests
+    name: 4. Production Build Verification
+    needs: tests
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -63,5 +85,7 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Run TypeScript typecheck
-        run: npx tsc --noEmit
+      - name: Run Expo Bundle Build
+        env:
+          EXPO_NO_TELEMETRY: 1
+        run: npx expo export --platform android
