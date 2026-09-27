@@ -1,5 +1,7 @@
-import React from 'react';
-import { View, Text, Pressable, ScrollView } from 'react-native';
+import React, { useState } from 'react';
+import { View, Text, Pressable } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { PeriodDropdownModal } from './period-dropdown-modal';
 
 export const MONTHS = [
   'All',
@@ -22,65 +24,60 @@ export function PeriodSelector({
   selectedMonth,
   onSelectMonth,
 }: PeriodSelectorProps) {
-  return (
-    <View className="mb-6 space-y-3">
-      {/* Year Selector */}
-      <View>
-        <Text className="text-[12px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
-          Select Year
-        </Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
-          {YEARS.map((yr) => {
-            const isSelected = selectedYear === yr;
-            return (
-              <Pressable
-                key={yr}
-                onPress={() => onSelectYear(yr)}
-                className={`px-3.5 py-1.5 rounded-full border mr-2 ${
-                  isSelected
-                    ? 'border-emerald-400 bg-emerald-500/20'
-                    : 'border-slate-800 bg-slate-900/60'
-                }`}>
-                <Text
-                  className={`text-[13px] font-medium ${
-                    isSelected ? 'text-emerald-400 font-bold' : 'text-slate-300'
-                  }`}>
-                  {yr === 'All' ? 'All Years' : yr}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-      </View>
+  const [activeModal, setActiveModal] = useState<'year' | 'month' | null>(null);
 
-      {/* Month Selector */}
-      <View className="mt-2">
-        <Text className="text-[12px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
-          Select Month
-        </Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false} className="flex-row">
-          {MONTHS.map((m, idx) => {
-            const isSelected = selectedMonth === m;
-            return (
-              <Pressable
-                key={m}
-                onPress={() => onSelectMonth(m)}
-                className={`px-3.5 py-1.5 rounded-full border mr-2 ${
-                  isSelected
-                    ? 'border-emerald-400 bg-emerald-500/20'
-                    : 'border-slate-800 bg-slate-900/60'
-                }`}>
-                <Text
-                  className={`text-[13px] font-medium ${
-                    isSelected ? 'text-emerald-400 font-bold' : 'text-slate-300'
-                  }`}>
-                  {m === 'All' ? 'All Months' : m}
-                </Text>
-              </Pressable>
-            );
-          })}
-        </ScrollView>
-      </View>
+  return (
+    <View className="mb-6 flex-row gap-3">
+      {/* Year Dropdown Trigger */}
+      <Pressable
+        onPress={() => setActiveModal('year')}
+        className="flex-1 bg-slate-900/90 border border-slate-800/90 p-3.5 rounded-2xl flex-row justify-between items-center active:opacity-80">
+        <View className="flex-row items-center gap-2">
+          <Ionicons name="calendar-outline" size={18} color="#34D399" />
+          <View>
+            <Text className="text-[10px] uppercase font-bold text-slate-400">Year</Text>
+            <Text className="text-[14px] font-bold text-white mt-0.5">
+              {selectedYear === 'All' ? 'All Years' : selectedYear}
+            </Text>
+          </View>
+        </View>
+        <Ionicons name="chevron-down" size={16} color="#94A3B8" />
+      </Pressable>
+
+      {/* Month Dropdown Trigger */}
+      <Pressable
+        onPress={() => setActiveModal('month')}
+        className="flex-1 bg-slate-900/90 border border-slate-800/90 p-3.5 rounded-2xl flex-row justify-between items-center active:opacity-80">
+        <View className="flex-row items-center gap-2">
+          <Ionicons name="time-outline" size={18} color="#60A5FA" />
+          <View>
+            <Text className="text-[10px] uppercase font-bold text-slate-400">Month</Text>
+            <Text className="text-[14px] font-bold text-white mt-0.5">
+              {selectedMonth === 'All' ? 'All Months' : selectedMonth}
+            </Text>
+          </View>
+        </View>
+        <Ionicons name="chevron-down" size={16} color="#94A3B8" />
+      </Pressable>
+
+      {/* Modals */}
+      <PeriodDropdownModal
+        visible={activeModal === 'year'}
+        title="Year"
+        options={YEARS}
+        selectedValue={selectedYear}
+        onSelect={onSelectYear}
+        onClose={() => setActiveModal(null)}
+      />
+
+      <PeriodDropdownModal
+        visible={activeModal === 'month'}
+        title="Month"
+        options={MONTHS}
+        selectedValue={selectedMonth}
+        onSelect={onSelectMonth}
+        onClose={() => setActiveModal(null)}
+      />
     </View>
   );
 }

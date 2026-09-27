@@ -6,6 +6,27 @@
 
 ---
 
+## 📱 Building the Android APK
+
+### 1. Cloud Build via EAS (Recommended)
+Building in the cloud with EAS generates an installable `.apk` link without requiring Android Studio:
+
+```bash
+npx eas-cli build --platform android --profile preview
+```
+*Once complete, EAS will generate a download URL and QR code to install the APK directly on your Android device.*
+
+### 2. Local APK Build (Requires Android SDK)
+```bash
+# Using EAS CLI locally:
+npx eas-cli build --platform android --profile preview --local
+
+# Or building directly via Expo CLI:
+npx expo run:android --variant release
+```
+
+---
+
 ## 💡 Detailed Overview: What Exactly Does This App Do?
 
 Finance Pro acts as your complete personal finance engine, combining real-time monthly cash flow tracking with multi-year analytical capabilities and automated data import from historical Android SQLite backup files.

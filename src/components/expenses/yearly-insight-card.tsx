@@ -22,7 +22,7 @@ export function YearlyInsightCard({ categoryList, totalExpenses, year }: YearlyI
   const displayYear = year === 'All' ? 'Overall' : year;
 
   return (
-    <View className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 mb-6 shadow-xl">
+    <View className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 mb-8 shadow-xl">
       {/* Top Banner Header */}
       <View className="flex-row items-center gap-2 mb-3">
         <View className="w-8 h-8 rounded-full bg-amber-500/15 border border-amber-500/30 items-center justify-center">
@@ -34,21 +34,21 @@ export function YearlyInsightCard({ categoryList, totalExpenses, year }: YearlyI
       </View>
 
       {/* Main Insight Text */}
-      <Text className="text-[16px] font-semibold text-white leading-snug mb-4">
+      <Text className="text-[16px] font-semibold text-white leading-snug mb-5">
         {topCategory.emoji} <Text className="font-bold text-amber-300">{topCategory.name}</Text> was your highest expense, totaling{' '}
         <Text className="font-extrabold text-white">₹{topCategory.amount.toLocaleString('en-IN')}</Text>{' '}
         ({topCategory.percentage}% of all {displayYear.toLowerCase()} spending).
       </Text>
 
-      {/* Modern Horizontal Bar Graph */}
-      <View className="space-y-3 pt-3 border-t border-slate-800/80">
-        <Text className="text-[12px] font-semibold uppercase tracking-wider text-slate-400 mb-1">
+      {/* Modern Horizontal Bar Graph with Generous Spacing */}
+      <View className="space-y-4 pt-4 border-t border-slate-800/80">
+        <Text className="text-[12px] font-semibold uppercase tracking-wider text-slate-400 mb-2">
           Top Expenses Breakdown
         </Text>
         {categoryList.slice(0, 4).map((cat) => (
-          <View key={cat.name} className="space-y-1">
+          <View key={cat.name} className="mb-3 space-y-1.5">
             <View className="flex-row justify-between items-center text-[12px]">
-              <Text className="text-[13px] font-medium text-slate-200">
+              <Text className="text-[13.5px] font-medium text-slate-200">
                 {cat.emoji} {cat.name}
               </Text>
               <Text className="text-[13px] font-bold text-slate-300">
@@ -57,7 +57,7 @@ export function YearlyInsightCard({ categoryList, totalExpenses, year }: YearlyI
             </View>
 
             {/* Visual Bar */}
-            <View className="w-full h-2.5 bg-slate-800 rounded-full overflow-hidden">
+            <View className="w-full h-2.5 bg-slate-800/90 rounded-full overflow-hidden mt-1">
               <View
                 className="h-full bg-emerald-400 rounded-full"
                 style={{ width: `${Math.min(100, Math.max(5, cat.percentage))}%` }}

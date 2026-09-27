@@ -78,10 +78,10 @@ export function calculateCurrentMonthStats(transactions: Transaction[]) {
     }
   });
 
-  const displayIncome = monthIncome > 0 ? monthIncome : 85000;
-  const displayExpenses = monthExpenses > 0 ? monthExpenses : 13586;
+  const displayIncome = monthIncome;
+  const displayExpenses = monthExpenses;
   const displaySaved = Math.max(0, displayIncome - displayExpenses);
-  const displayRate = Math.round((displaySaved / displayIncome) * 100);
+  const displayRate = displayIncome > 0 ? Math.round((displaySaved / displayIncome) * 100) : 0;
 
   const categories: SpendingCategory[] = Object.values(monthCatMap)
     .sort((a, b) => b.amount - a.amount)
