@@ -1,20 +1,10 @@
 import React from 'react';
 import { View, Text, Pressable, ScrollView } from 'react-native';
+import { BACKUP_CATEGORIES, CategoryItem } from '@/constants/categories';
 
-export interface CategoryOption {
-  id: string;
-  name: string;
-  emoji: string;
-}
+export type CategoryOption = CategoryItem;
 
-export const CATEGORY_OPTIONS: CategoryOption[] = [
-  { id: '1', name: 'Food', emoji: '🍔' },
-  { id: '2', name: 'Rent', emoji: '🏠' },
-  { id: '3', name: 'Transport', emoji: '🚗' },
-  { id: '4', name: 'Shopping', emoji: '🛍️' },
-  { id: '5', name: 'Salary', emoji: '💰' },
-  { id: '6', name: 'Bills', emoji: '⚡' },
-];
+export const CATEGORY_OPTIONS: CategoryOption[] = BACKUP_CATEGORIES;
 
 interface CategorySelectorProps {
   selectedCategory: CategoryOption;
@@ -40,7 +30,7 @@ export function CategorySelector({
             <Pressable
               key={cat.id}
               onPress={() => onSelectCategory(cat)}
-              className={`flex-row items-center gap-1.5 px-4 py-2 rounded-full border mr-2.5 ${
+              className={`flex-row items-center gap-1.5 px-3.5 py-2 rounded-full border mr-2 ${
                 isSelected
                   ? 'border-emerald-400/90 bg-emerald-400/10'
                   : 'border-slate-800/90 bg-slate-900/40'
@@ -59,3 +49,4 @@ export function CategorySelector({
     </View>
   );
 }
+

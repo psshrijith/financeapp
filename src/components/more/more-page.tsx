@@ -10,6 +10,8 @@ interface MorePageProps {
   useDemoData: boolean;
   onToggleDemoData: (value: boolean) => void;
   onRestoreBackup?: () => void;
+  onUploadFile?: () => void;
+  onManageCategories?: () => void;
   isRestored?: boolean;
 }
 
@@ -19,6 +21,8 @@ export function MorePage({
   useDemoData,
   onToggleDemoData,
   onRestoreBackup,
+  onUploadFile,
+  onManageCategories,
   isRestored,
 }: MorePageProps) {
   const safeAreaInsets = useSafeAreaInsets();
@@ -53,6 +57,8 @@ export function MorePage({
         showCategorySplit={showCategorySplit}
         onToggleCategorySplit={onToggleCategorySplit}
         onRestoreBackup={onRestoreBackup}
+        onUploadFile={onUploadFile}
+        onManageCategories={onManageCategories}
         isRestored={isRestored}
       />
     </ScrollView>

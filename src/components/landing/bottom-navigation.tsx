@@ -5,7 +5,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { TabItem } from './tab-item';
 
 
-export type TabType = 'home' | 'transactions' | 'networth' | 'more';
+export type TabType = 'home' | 'expenses' | 'transactions' | 'networth' | 'more';
 
 interface BottomNavigationProps {
   activeTab?: TabType;
@@ -56,10 +56,10 @@ export function BottomNavigation({
           onSelect={handleTabPress}
         />
         <TabItem
-          tabKey="transactions"
-          label="Activity"
-          iconActive="receipt"
-          iconInactive="receipt-outline"
+          tabKey="expenses"
+          label="Expenses"
+          iconActive="pie-chart"
+          iconInactive="pie-chart-outline"
           activeTab={activeTab}
           onSelect={handleTabPress}
         />
