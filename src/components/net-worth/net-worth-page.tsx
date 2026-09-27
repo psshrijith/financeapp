@@ -1,23 +1,32 @@
 import React from 'react';
-import { View, Text, ScrollView, Platform } from 'react-native';
-import Svg, { Path, Circle } from 'react-native-svg';
+import { View, Text, ScrollView, Pressable, Platform } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-
-import { NetWorthData } from '@/types/finance';
-import { DUMMY_NET_WORTH_DATA } from '@/data/dummy-finance-data';
-
+import { AccountItem } from '@/types/finance';
+import { NetWorthInsights } from './net-worth-insights';
 
 interface NetWorthPageProps {
-  netWorthData?: NetWorthData;
+  userAccounts?: AccountItem[];
+  onOpenAddAccountModal?: () => void;
+  onDeleteAccount?: (accId: string) => void;
 }
 
 export function NetWorthPage({
-  netWorthData = DUMMY_NET_WORTH_DATA,
+  userAccounts = [],
+  onOpenAddAccountModal,
+  onDeleteAccount,
 }: NetWorthPageProps) {
-
   const safeAreaInsets = useSafeAreaInsets();
-  const { totalNetWorth, monthlyChange, assets, liabilities, breakdown } =
-    netWorthData;
+
+  const assetsSum = userAccounts.reduce(
+    (acc, a) => (a.amount > 0 ? acc + a.amount : acc),
+    0
+  );
+  const liabilitiesSum = userAccounts.reduce(
+    (acc, a) => (a.amount < 0 ? acc + Math.abs(a.amount) : acc),
+    0
+  );
+  const totalNetWorth = assetsSum - liabilitiesSum;
 
   const containerPadding = {
     paddingTop: safeAreaInsets.top + 8,
@@ -29,112 +38,93 @@ export function NetWorthPage({
       className="flex-1 bg-slate-950"
       contentContainerStyle={[{ paddingHorizontal: 20 }, containerPadding]}
       showsVerticalScrollIndicator={false}>
-      {/* 1. Header */}
-      <View className="mb-6">
-        <Text className="text-[24px] font-bold text-white tracking-tight">
-          Net worth
-        </Text>
-        <Text className="text-[13px] text-slate-400 font-normal mt-0.5">
-          Everything you own, minus what you owe
-        </Text>
+      {/* 1. Header & Add Button */}
+      <View className="flex-row justify-between items-center mb-6">
+        <View>
+          <Text className="text-[24px] font-bold text-white tracking-tight">Net worth</Text>
+          <Text className="text-[13px] text-slate-400 font-normal mt-0.5">
+            Everything you own, minus what you owe
+          </Text>
+        </View>
+        <Pressable
+          onPress={onOpenAddAccountModal}
+          className="flex-row items-center gap-1.5 bg-emerald-500/20 border border-emerald-500/40 px-3 py-2 rounded-xl active:opacity-80">
+          <Ionicons name="add" size={16} color="#34D399" />
+          <Text className="text-xs font-bold text-emerald-400">Add Account</Text>
+        </Pressable>
       </View>
 
-
-      {/* 2. Hero Net Worth Summary */}
-      <View className="mb-2">
-        <Text className="text-[13px] text-slate-400 font-medium mb-1">
-          Total net worth
-        </Text>
+      {/* Hero Net Worth Summary */}
+      <View className="mb-6 bg-slate-900/60 border border-slate-800/60 rounded-3xl p-5">
+        <Text className="text-[13px] text-slate-400 font-medium mb-1">Total net worth</Text>
         <Text
-          className="text-[38px] font-bold text-white tracking-tight leading-none font-serif"
+          className="text-[36px] font-bold text-white tracking-tight leading-none"
           style={{ fontFamily: Platform.OS === 'ios' ? 'Georgia' : 'serif' }}>
           ₹{totalNetWorth.toLocaleString('en-IN')}
         </Text>
 
-        <View className="flex-row items-center gap-1.5 mt-2 mb-6">
-          <Text className="text-emerald-400 font-semibold text-[13px]">
-            ↑ ₹{monthlyChange.toLocaleString('en-IN')} this month
-          </Text>
+        <View className="flex-row gap-3 mt-5 pt-4 border-t border-slate-800/60">
+          <View className="flex-1">
+            <Text className="text-[12px] text-slate-400 font-medium mb-0.5">Assets</Text>
+            <Text className="text-[17px] font-bold text-emerald-400">
+              ₹{assetsSum.toLocaleString('en-IN')}
+            </Text>
+          </View>
+          <View className="flex-1">
+            <Text className="text-[12px] text-slate-400 font-medium mb-0.5">Liabilities</Text>
+            <Text className="text-[17px] font-bold text-amber-500">
+              ₹{liabilitiesSum.toLocaleString('en-IN')}
+            </Text>
+          </View>
         </View>
       </View>
 
-      {/* 3. Smooth Growth SVG Chart */}
-      <View className="w-full h-20 mb-8 items-center justify-center">
-        <Svg height={64} width="100%" viewBox="0 0 320 64" fill="none">
-          <Path
-            d="M 2 52 C 80 50, 160 38, 240 22 T 316 8"
-            stroke="#34D399"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-          <Circle cx={316} cy={8} r={4} fill="#34D399" />
-        </Svg>
-      </View>
+      {/* Asset Contribution Graph & Insights */}
+      <NetWorthInsights userAccounts={userAccounts} assetsSum={assetsSum} />
 
-      {/* 4. Assets & Liabilities Cards Row */}
-      <View className="flex-row gap-3 mb-8">
-        {/* Assets Card */}
-        <View className="flex-1 bg-slate-900/60 border border-slate-800/40 rounded-2xl p-4">
-          <Text className="text-[13px] text-slate-400 font-medium mb-1">
-            Assets
-          </Text>
-          <Text className="text-[20px] font-bold text-emerald-400 tracking-tight">
-            ₹{assets.toLocaleString('en-IN')}
-          </Text>
-        </View>
-
-        {/* Liabilities Card */}
-        <View className="flex-1 bg-slate-900/60 border border-slate-800/40 rounded-2xl p-4">
-          <Text className="text-[13px] text-slate-400 font-medium mb-1">
-            Liabilities
-          </Text>
-          <Text className="text-[20px] font-bold text-amber-500 tracking-tight">
-            ₹{liabilities.toLocaleString('en-IN')}
-          </Text>
-        </View>
-      </View>
-
-      {/* 5. Breakdown Section */}
+      {/* 3. Accounts Breakdown */}
       <View className="mb-8">
-        <Text className="text-[18px] font-bold text-white mb-3">
-          Breakdown
-        </Text>
+        <Text className="text-[17px] font-semibold text-white mb-3">Your Accounts & Assets</Text>
 
-        <View className="divide-y divide-slate-800/40">
-          {breakdown.map((item) => (
-            <View
-              key={item.id}
-              className="flex-row justify-between items-center py-3.5">
-              {/* Left: Dot + Title + Category */}
-              <View className="flex-row items-center flex-1">
-                <View
-                  className="w-2.5 h-2.5 rounded-full mr-3"
-                  style={{ backgroundColor: item.dotColor }}
-                />
-                <View>
-                  <Text className="text-[15px] font-medium text-white">
-                    {item.name}
+        {userAccounts.length === 0 ? (
+          <View className="py-8 items-center justify-center border border-dashed border-slate-800/80 rounded-2xl bg-slate-900/30 px-4">
+            <Text className="text-[28px] mb-2">🏦</Text>
+            <Text className="text-[15px] font-semibold text-slate-200">No accounts added yet</Text>
+            <Text className="text-[12px] text-slate-400 font-normal mt-1 text-center mb-4">
+              Add your bank accounts, cash, fixed deposits, or mutual funds to track your net worth
+            </Text>
+            <Pressable
+              onPress={onOpenAddAccountModal}
+              className="bg-emerald-500 px-4 py-2.5 rounded-xl active:opacity-90">
+              <Text className="text-slate-950 font-bold text-xs">+ Add First Account</Text>
+            </Pressable>
+          </View>
+        ) : (
+          <View className="bg-slate-900/40 border border-slate-800/40 rounded-2xl p-4 divide-y divide-slate-800/40">
+            {userAccounts.map((acc) => (
+              <View key={acc.id} className="flex-row justify-between items-center py-3">
+                <View className="flex-row items-center gap-3 flex-1">
+                  <Text className="text-xl">{acc.emoji}</Text>
+                  <View>
+                    <Text className="text-[15px] font-semibold text-white">{acc.name}</Text>
+                    <Text className="text-[12px] text-slate-400 mt-0.5">{acc.categoryName}</Text>
+                  </View>
+                </View>
+
+                <View className="flex-row items-center gap-3">
+                  <Text className={`text-[15px] font-bold ${acc.amount < 0 ? 'text-amber-500' : 'text-white'}`}>
+                    {acc.amount < 0 ? `-₹${Math.abs(acc.amount).toLocaleString('en-IN')}` : `₹${acc.amount.toLocaleString('en-IN')}`}
                   </Text>
-                  <Text className="text-[12px] text-slate-400 mt-0.5 font-normal">
-                    {item.category}
-                  </Text>
+                  {onDeleteAccount && (
+                    <Pressable onPress={() => onDeleteAccount(acc.id)} className="p-1 active:opacity-60">
+                      <Ionicons name="trash-outline" size={16} color="#F87171" />
+                    </Pressable>
+                  )}
                 </View>
               </View>
-
-              {/* Right: Amount + Percentage of assets */}
-              <View className="items-end">
-                <Text className="text-[15px] font-semibold text-white">
-                  {item.amount < 0
-                    ? `-₹${Math.abs(item.amount).toLocaleString('en-IN')}`
-                    : `₹${item.amount.toLocaleString('en-IN')}`}
-                </Text>
-                <Text className="text-[12px] text-slate-400 mt-0.5 font-normal">
-                  {item.percentageOfAssets}
-                </Text>
-              </View>
-            </View>
-          ))}
-        </View>
+            ))}
+          </View>
+        )}
       </View>
     </ScrollView>
   );

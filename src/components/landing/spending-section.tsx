@@ -5,12 +5,30 @@ import { SpendingCategory } from '@/types/finance';
 
 interface SpendingSectionProps {
   categories?: SpendingCategory[];
+  isDemoData?: boolean;
 }
 
-export function SpendingSection({ categories }: SpendingSectionProps) {
-  const displayCategories = categories && categories.length > 0
-    ? categories
-    : DUMMY_SPENDING_CATEGORIES;
+export function SpendingSection({ categories, isDemoData }: SpendingSectionProps) {
+  const displayCategories = isDemoData
+    ? DUMMY_SPENDING_CATEGORIES
+    : categories || [];
+
+  if (displayCategories.length === 0) {
+    return (
+      <View className="mb-8">
+        <View className="flex-row justify-between items-center mb-3">
+          <Text className="text-[17px] font-semibold text-white tracking-tight">
+            Spending by category
+          </Text>
+        </View>
+        <View className="py-6 items-center justify-center border border-dashed border-slate-800/80 rounded-2xl bg-slate-900/30 px-4">
+          <Text className="text-[13px] font-semibold text-slate-400">
+            No category spending recorded yet
+          </Text>
+        </View>
+      </View>
+    );
+  }
 
   return (
     <View className="mb-8">

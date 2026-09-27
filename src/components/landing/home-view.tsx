@@ -41,7 +41,7 @@ export function HomeView({
         <InsightCard isDemoData={useDemoData} />
         <BalanceSummary snapshot={activeSnapshot} />
         <CashFlowSummary snapshot={activeSnapshot} />
-        {showCategorySplit ? <SpendingSection categories={categories} /> : null}
+        {showCategorySplit ? <SpendingSection categories={categories} isDemoData={useDemoData} /> : null}
         <RecentTransactions transactions={activeTransactions} />
       </View>
     </ScrollView>

@@ -6,6 +6,7 @@ import { Transaction } from '@/types/finance';
 import { PeriodSelector } from './period-selector';
 import { ExpenseSummaryCard } from './expense-summary-card';
 import { YearlyInsightCard } from './yearly-insight-card';
+import { DayByDayExpensesList } from './day-by-day-expenses-list';
 
 const MONTH_MAP: Record<string, string> = {
   Jan: '-01-', Feb: '-02-', Mar: '-03-', Apr: '-04-',
@@ -17,10 +18,12 @@ interface ExpenseAnalyticsPageProps {
   transactions: Transaction[];
 }
 
+import { groupTransactionsByDay } from '@/utils/transaction-helper';
+
 export function ExpenseAnalyticsPage({ transactions }: ExpenseAnalyticsPageProps) {
   const safeAreaInsets = useSafeAreaInsets();
-  const [selectedYear, setSelectedYear] = useState('All');
-  const [selectedMonth, setSelectedMonth] = useState('All');
+  const [selectedYear, setSelectedYear] = useState('2026');
+  const [selectedMonth, setSelectedMonth] = useState('Sep');
 
   const filteredData = useMemo(() => {
     let list = transactions;
@@ -31,7 +34,7 @@ export function ExpenseAnalyticsPage({ transactions }: ExpenseAnalyticsPageProps
 
     if (selectedMonth !== 'All' && MONTH_MAP[selectedMonth]) {
       const code = MONTH_MAP[selectedMonth];
-      list = list.filter((t) => t.date.includes(code));
+      list = list.filter((t) => t.date.includes(code) || t.date === 'Today' || t.date === 'Yesterday');
     }
 
     let expensesSum = 0;
@@ -58,11 +61,14 @@ export function ExpenseAnalyticsPage({ transactions }: ExpenseAnalyticsPageProps
         percentage: expensesSum > 0 ? Math.round((c.amount / expensesSum) * 100) : 0,
       }));
 
+    const dayGroups = groupTransactionsByDay(list.filter((t) => t.type === 'expense'));
+
     return {
       filteredTransactions: list,
       totalExpenses: expensesSum,
       totalIncome: incomeSum,
       categoryList,
+      dayGroups,
     };
   }, [transactions, selectedYear, selectedMonth]);
 
@@ -76,22 +82,16 @@ export function ExpenseAnalyticsPage({ transactions }: ExpenseAnalyticsPageProps
       className="flex-1 bg-slate-950"
       contentContainerStyle={[{ paddingHorizontal: 20 }, containerPadding]}
       showsVerticalScrollIndicator={false}>
-      {/* Header */}
       <View className="flex-row items-center gap-2.5 mb-6">
         <View className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 items-center justify-center">
           <Ionicons name="pie-chart-outline" size={20} color="#34D399" />
         </View>
         <View>
-          <Text className="text-[24px] font-bold text-white tracking-tight">
-            Expense Analytics
-          </Text>
-          <Text className="text-[13px] text-slate-400 font-normal">
-            Calculate expenses by month & year
-          </Text>
+          <Text className="text-[24px] font-bold text-white tracking-tight">Expense Analytics</Text>
+          <Text className="text-[13px] text-slate-400 font-normal">Calculate expenses by month & year</Text>
         </View>
       </View>
 
-      {/* Dropdown Period Selectors */}
       <PeriodSelector
         selectedYear={selectedYear}
         onSelectYear={setSelectedYear}
@@ -99,7 +99,6 @@ export function ExpenseAnalyticsPage({ transactions }: ExpenseAnalyticsPageProps
         onSelectMonth={setSelectedMonth}
       />
 
-      {/* Summary Card */}
       <ExpenseSummaryCard
         totalExpenses={filteredData.totalExpenses}
         totalIncome={filteredData.totalIncome}
@@ -108,14 +107,12 @@ export function ExpenseAnalyticsPage({ transactions }: ExpenseAnalyticsPageProps
         year={selectedYear}
       />
 
-      {/* Yearly Spending Insight & Graph */}
       <YearlyInsightCard
         categoryList={filteredData.categoryList}
         totalExpenses={filteredData.totalExpenses}
         year={selectedYear}
       />
 
-      {/* Category Breakdown with Generous Spacing */}
       {filteredData.categoryList.length > 0 && (
         <View className="mb-8">
           <Text className="text-[17px] font-semibold text-white mb-4">
@@ -129,9 +126,7 @@ export function ExpenseAnalyticsPage({ transactions }: ExpenseAnalyticsPageProps
                   <Text className="text-[15px] font-semibold text-white">{cat.name}</Text>
                 </View>
                 <View className="items-end">
-                  <Text className="text-[15px] font-bold text-white">
-                    ₹{cat.amount.toLocaleString('en-IN')}
-                  </Text>
+                  <Text className="text-[15px] font-bold text-white">₹{cat.amount.toLocaleString('en-IN')}</Text>
                   <Text className="text-[12px] text-slate-400 mt-0.5 font-medium">{cat.percentage}% of period</Text>
                 </View>
               </View>
@@ -139,6 +134,9 @@ export function ExpenseAnalyticsPage({ transactions }: ExpenseAnalyticsPageProps
           </View>
         </View>
       )}
+
+      {/* Day-by-Day Expenses Breakdown */}
+      <DayByDayExpensesList dayGroups={filteredData.dayGroups} />
     </ScrollView>
   );
 }

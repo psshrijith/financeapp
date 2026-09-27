@@ -10,6 +10,8 @@ import { ExpenseAnalyticsPage } from '../expenses/expense-analytics-page';
 import { NetWorthPage } from '../net-worth/net-worth-page';
 import { MorePage } from '../more/more-page';
 import { CategoryManagerModal } from '../categories/category-manager-modal';
+import { AddAccountModal } from '../net-worth/add-account-modal';
+import { SetBudgetModal } from '../more/set-budget-modal';
 
 export function LandingPage() {
   const safeAreaInsets = useSafeAreaInsets();
@@ -26,7 +28,11 @@ export function LandingPage() {
       {activeTab === 'expenses' ? (
         <ExpenseAnalyticsPage transactions={state.activeTransactions} />
       ) : activeTab === 'networth' ? (
-        <NetWorthPage netWorthData={state.activeNetWorth} />
+        <NetWorthPage
+          userAccounts={state.userAccounts}
+          onOpenAddAccountModal={() => state.setIsAddAccountModalVisible(true)}
+          onDeleteAccount={state.handleDeleteAccount}
+        />
       ) : activeTab === 'more' ? (
         <MorePage
           showCategorySplit={state.showCategorySplit}
@@ -36,6 +42,8 @@ export function LandingPage() {
           onRestoreBackup={state.handleRestoreBackup}
           onUploadFile={state.handleUploadFile}
           onManageCategories={() => state.setIsCategoryModalVisible(true)}
+          onSetMonthlyBudget={() => state.setIsSetBudgetModalVisible(true)}
+          monthlyBudget={state.monthlyBudget}
           isRestored={state.isRestored}
         />
       ) : (
@@ -67,6 +75,19 @@ export function LandingPage() {
         categories={state.managedCategories}
         onAddCategory={state.handleAddCategory}
         onRemoveCategory={state.handleRemoveCategory}
+      />
+
+      <AddAccountModal
+        visible={state.isAddAccountModalVisible}
+        onClose={() => state.setIsAddAccountModalVisible(false)}
+        onAddAccount={state.handleAddAccount}
+      />
+
+      <SetBudgetModal
+        visible={state.isSetBudgetModalVisible}
+        currentBudget={state.monthlyBudget}
+        onClose={() => state.setIsSetBudgetModalVisible(false)}
+        onSaveBudget={state.handleSaveMonthlyBudget}
       />
     </View>
   );

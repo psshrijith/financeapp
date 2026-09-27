@@ -10,6 +10,8 @@ interface SettingsListProps {
   onRestoreBackup?: () => void;
   onUploadFile?: () => void;
   onManageCategories?: () => void;
+  onSetMonthlyBudget?: () => void;
+  monthlyBudget?: number;
   isRestored?: boolean;
 }
 

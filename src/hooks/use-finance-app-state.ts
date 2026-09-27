@@ -10,7 +10,7 @@ import {
   RESTORED_CATEGORIES,
   RESTORED_NET_WORTH,
 } from '@/data/restored-data-loader';
-import { Transaction, TransactionType, SpendingCategory } from '@/types/finance';
+import { AccountItem, Transaction, TransactionType, SpendingCategory } from '@/types/finance';
 import {
   createNewTransaction,
   updateSnapshotWithTransaction,
@@ -24,12 +24,16 @@ export function useFinanceAppState() {
   const [useDemoData, setUseDemoData] = useState(false);
   const [isAddModalVisible, setIsAddModalVisible] = useState(false);
   const [isCategoryModalVisible, setIsCategoryModalVisible] = useState(false);
-  const [isRestored, setIsRestored] = useState(true);
+  const [isAddAccountModalVisible, setIsAddAccountModalVisible] = useState(false);
+  const [isSetBudgetModalVisible, setIsSetBudgetModalVisible] = useState(false);
+  const [monthlyBudget, setMonthlyBudget] = useState(50000);
+  const [isRestored, setIsRestored] = useState(false);
 
   const [managedCategories, setManagedCategories] = useState<CategoryItem[]>(BACKUP_CATEGORIES);
-  const [userTransactions, setUserTransactions] = useState<Transaction[]>(RESTORED_TRANSACTIONS);
+  const [userTransactions, setUserTransactions] = useState<Transaction[]>([]);
   const [, setUserSnapshot] = useState(RESTORED_SNAPSHOT);
-  const [userCategories, setUserCategories] = useState<SpendingCategory[]>(RESTORED_CATEGORIES);
+  const [userCategories, setUserCategories] = useState<SpendingCategory[]>([]);
+  const [userAccounts, setUserAccounts] = useState<AccountItem[]>([]);
 
   const monthStats = calculateCurrentMonthStats(userTransactions);
 
@@ -95,6 +99,18 @@ export function useFinanceAppState() {
     setUserSnapshot((prev) => updateSnapshotWithTransaction(prev, newTxData.amount, newTxData.type));
   };
 
+  const handleAddAccount = (acc: AccountItem) => {
+    setUserAccounts((prev) => [acc, ...prev]);
+  };
+
+  const handleDeleteAccount = (accId: string) => {
+    setUserAccounts((prev) => prev.filter((a) => a.id !== accId));
+  };
+
+  const handleSaveMonthlyBudget = (newBudget: number) => {
+    setMonthlyBudget(newBudget);
+  };
+
   return {
     showCategorySplit,
     setShowCategorySplit,
@@ -104,9 +120,15 @@ export function useFinanceAppState() {
     setIsAddModalVisible,
     isCategoryModalVisible,
     setIsCategoryModalVisible,
+    isAddAccountModalVisible,
+    setIsAddAccountModalVisible,
+    isSetBudgetModalVisible,
+    setIsSetBudgetModalVisible,
+    monthlyBudget,
     isRestored,
     managedCategories,
     userCategories: activeCategories,
+    userAccounts,
     activeTransactions,
     activeSnapshot,
     activeNetWorth,
@@ -115,5 +137,8 @@ export function useFinanceAppState() {
     handleAddCategory,
     handleRemoveCategory,
     handleAddTransaction,
+    handleAddAccount,
+    handleDeleteAccount,
+    handleSaveMonthlyBudget,
   };
 }

@@ -63,3 +63,15 @@ export interface NetWorthData {
   breakdown: NetWorthBreakdownItem[];
 }
 
+export type AccountType = 'bank' | 'cash' | 'investment' | 'emergency' | 'liability';
+
+export interface AccountItem {
+  id: string;
+  name: string;
+  type: AccountType;
+  amount: number;
+  emoji: string;
+  categoryName: string;
+  color: string;
+}
+

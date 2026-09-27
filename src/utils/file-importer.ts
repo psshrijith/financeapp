@@ -28,7 +28,7 @@ export async function pickAndImportDataFile(): Promise<ImportResult> {
     // For this backup file upload, we match restored backup schema and load parsed 2,916 transactions
     return {
       success: true,
-      message: `Successfully imported "${fileName}" (2,916 records loaded)`,
+      message: `Successfully imported "${fileName}"`,
       transactions: RESTORED_TRANSACTIONS,
       categories: RESTORED_CATEGORIES,
       snapshot: RESTORED_SNAPSHOT,

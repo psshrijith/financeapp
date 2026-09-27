@@ -12,6 +12,8 @@ interface MorePageProps {
   onRestoreBackup?: () => void;
   onUploadFile?: () => void;
   onManageCategories?: () => void;
+  onSetMonthlyBudget?: () => void;
+  monthlyBudget?: number;
   isRestored?: boolean;
 }
 
@@ -23,6 +25,8 @@ export function MorePage({
   onRestoreBackup,
   onUploadFile,
   onManageCategories,
+  onSetMonthlyBudget,
+  monthlyBudget,
   isRestored,
 }: MorePageProps) {
   const safeAreaInsets = useSafeAreaInsets();
@@ -59,6 +63,8 @@ export function MorePage({
         onRestoreBackup={onRestoreBackup}
         onUploadFile={onUploadFile}
         onManageCategories={onManageCategories}
+        onSetMonthlyBudget={onSetMonthlyBudget}
+        monthlyBudget={monthlyBudget}
         isRestored={isRestored}
       />
     </ScrollView>

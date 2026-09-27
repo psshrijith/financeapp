@@ -7,12 +7,13 @@ export function createNewTransaction(data: {
   category: string;
   emoji: string;
 }): Transaction {
+  const todayIso = new Date().toISOString().split('T')[0]; // e.g. '2026-09-27'
   return {
     id: Date.now().toString(),
     title: data.title,
     category: `${data.category} · Today`,
     amount: data.amount,
-    date: 'Today',
+    date: todayIso.includes('2026') ? todayIso : '2026-09-27',
     type: data.type,
     emoji: data.emoji,
     iconBg: data.type === 'income' ? '#D1FAE5' : '#FEF3C7',
@@ -107,4 +108,41 @@ export function calculateCurrentMonthStats(transactions: Transaction[]) {
     },
     categories,
   };
+}
+
+export interface DayGroup {
+  dateLabel: string;
+  totalExpenses: number;
+  totalIncome: number;
+  items: Transaction[];
+}
+
+export function groupTransactionsByDay(transactions: Transaction[]): DayGroup[] {
+  const map: Record<string, DayGroup> = {};
+  const order: string[] = [];
+
+  transactions.forEach((t) => {
+    let dateLabel = t.date || 'Today';
+    if (dateLabel === 'Today') dateLabel = 'Today';
+    if (dateLabel === 'Yesterday') dateLabel = 'Yesterday';
+
+    if (!map[dateLabel]) {
+      map[dateLabel] = {
+        dateLabel,
+        totalExpenses: 0,
+        totalIncome: 0,
+        items: [],
+      };
+      order.push(dateLabel);
+    }
+
+    map[dateLabel].items.push(t);
+    if (t.type === 'expense') {
+      map[dateLabel].totalExpenses += t.amount;
+    } else {
+      map[dateLabel].totalIncome += t.amount;
+    }
+  });
+
+  return order.map((key) => map[key]);
 }

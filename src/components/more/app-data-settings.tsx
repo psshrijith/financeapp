@@ -10,6 +10,8 @@ interface AppDataSettingsProps {
   onRestoreBackup?: () => void;
   onUploadFile?: () => void;
   onManageCategories?: () => void;
+  onSetMonthlyBudget?: () => void;
+  monthlyBudget?: number;
   isRestored?: boolean;
 }
 
@@ -21,6 +23,8 @@ export function AppDataSettings({
   onRestoreBackup,
   onUploadFile,
   onManageCategories,
+  onSetMonthlyBudget,
+  monthlyBudget = 50000,
   isRestored,
 }: AppDataSettingsProps) {
   return (
@@ -30,6 +34,20 @@ export function AppDataSettings({
       </Text>
 
       <View className="bg-slate-900/60 border border-slate-800/60 rounded-2xl divide-y divide-slate-800/40">
+        <Pressable
+          onPress={onSetMonthlyBudget}
+          className="flex-row items-center justify-between p-4 active:opacity-70">
+          <View className="flex-row items-center gap-3 flex-1 pr-3">
+            <View className="w-9 h-9 rounded-xl bg-emerald-500/15 border border-emerald-500/30 items-center justify-center">
+              <Ionicons name="wallet-outline" size={18} color="#34D399" />
+            </View>
+            <View className="flex-1">
+              <Text className="text-[15px] font-semibold text-white">Set Monthly Budget</Text>
+              <Text className="text-[12px] text-slate-400 mt-0.5">Target: ₹{monthlyBudget.toLocaleString('en-IN')}</Text>
+            </View>
+          </View>
+          <Text className="text-[13px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">Set</Text>
+        </Pressable>
         <Pressable
           onPress={onManageCategories}
           className="flex-row items-center justify-between p-4 active:opacity-70">
@@ -69,7 +87,7 @@ export function AppDataSettings({
             </View>
             <View className="flex-1">
               <Text className="text-[15px] font-semibold text-white">Restore Historical Backup</Text>
-              <Text className="text-[12px] text-slate-400 mt-0.5">{isRestored ? 'Restored 2,916 transactions from backup' : 'Import 2,916 transactions from ~/Downloads'}</Text>
+              <Text className="text-[12px] text-slate-400 mt-0.5">{isRestored ? 'Historical backup data loaded' : 'Load pre-configured backup data'}</Text>
             </View>
           </View>
           <Text className="text-[13px] font-semibold text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-full border border-emerald-500/20">{isRestored ? 'Active' : 'Restore'}</Text>

@@ -10,6 +10,7 @@
     "ios": {
       "icon": "./assets/images/icon.png"
     },
+    "jsEngine": "hermes",
     "android": {
       "adaptiveIcon": {
         "backgroundColor": "#090D16",
@@ -17,7 +18,9 @@
         "backgroundImage": "./assets/images/android-icon-background.png"
       },
       "predictiveBackGestureEnabled": false,
-      "package": "com.shrijithps.financeapp"
+      "package": "com.shrijithps.financeapp",
+      "enableProguardInReleaseBuilds": true,
+      "enableShrinkResourcesInReleaseBuilds": true
     },
     "web": {
       "output": "static",
