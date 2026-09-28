@@ -33,7 +33,7 @@ export function LandingPage() {
   const bgClass = state.themeMode === 'lights-out' ? 'bg-black' : 'bg-slate-950';
 
   return (
-    <View className={`flex-1 ${bgClass} relative`}>
+    <View className={`flex-1 ${bgClass} relative`} style={{ flex: 1, width: '100%', minHeight: '100%' }}>
       {activeTab === 'expenses' ? (
         <ExpenseAnalyticsPage
           transactions={state.activeTransactions}

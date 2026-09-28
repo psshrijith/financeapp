@@ -36,6 +36,7 @@ export function HomeView({
   return (
     <ScrollView
       className="flex-1"
+      style={{ flex: 1, width: '100%' }}
       contentContainerStyle={[{ paddingHorizontal: 20 }, containerPadding]}
       showsVerticalScrollIndicator={false}>
       <View className="w-full">

@@ -1,3 +1,4 @@
+import '../global.css';
 import { useEffect } from 'react';
 import { StatusBar } from 'expo-status-bar';
 import { DarkTheme, DefaultTheme, ThemeProvider } from 'expo-router';
@@ -24,7 +25,7 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === 'dark' ? DarkTheme : DefaultTheme}>
       <StatusBar style={colorScheme === 'dark' ? 'light' : 'dark'} />
-      <Stack screenOptions={{ headerShown: false }} />
+      <Stack screenOptions={{ headerShown: false, contentStyle: { flex: 1, width: '100%', height: '100%' } }} />
     </ThemeProvider>
   );
 }

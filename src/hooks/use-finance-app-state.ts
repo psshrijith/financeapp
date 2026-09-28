@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { loadFromStorage, saveToStorage } from '@/utils/storage-helper';
 import { DUMMY_RECENT_TRANSACTIONS, DUMMY_FINANCIAL_SNAPSHOT, DUMMY_NET_WORTH_DATA } from '@/data/dummy-finance-data';
 import { RESTORED_TRANSACTIONS, RESTORED_SNAPSHOT, RESTORED_CATEGORIES, RESTORED_NET_WORTH } from '@/data/restored-data-loader';
@@ -30,7 +30,13 @@ export function useFinanceAppState() {
   const [userCategories, setUserCategories] = useState<SpendingCategory[]>([]);
   const [userAccounts, setUserAccounts] = useState<AccountItem[]>(() => loadFromStorage('app_accounts', []));
 
+  const isMounted = useRef(false);
+
   useEffect(() => {
+    if (!isMounted.current) {
+      isMounted.current = true;
+      return;
+    }
     saveToStorage('app_theme_mode', themeMode);
     saveToStorage('app_monthly_budget', monthlyBudget);
     saveToStorage('app_categories', managedCategories);
@@ -87,14 +93,24 @@ export function useFinanceAppState() {
 
   const handleAddTransaction = (newTxData: { title: string; amount: number; type: TransactionType; category: string; emoji: string }) => {
     const newTx = createNewTransaction(newTxData);
-    setUserTransactions((prev) => [newTx, ...prev]);
+    setUserTransactions((prev) => {
+      const next = [newTx, ...prev];
+      saveToStorage('app_transactions', next);
+      return next;
+    });
     setUserSnapshot((prev) => updateSnapshotWithTransaction(prev, newTxData.amount, newTxData.type));
   };
 
-  const handleDeleteTransaction = (txId: string) => setUserTransactions((prev) => prev.filter((t) => t.id !== txId));
-  const handleAddAccount = (acc: AccountItem) => setUserAccounts((prev) => [acc, ...prev]);
-  const handleDeleteAccount = (accId: string) => setUserAccounts((prev) => prev.filter((a) => a.id !== accId));
-  const handleSaveMonthlyBudget = (newBudget: number) => setMonthlyBudget(newBudget);
+  const handleDeleteTransaction = (txId: string) => {
+    setUserTransactions((prev) => {
+      const next = prev.filter((t) => t.id !== txId);
+      saveToStorage('app_transactions', next);
+      return next;
+    });
+  };
+  const handleAddAccount = (acc: AccountItem) => setUserAccounts((prev) => { const next = [acc, ...prev]; saveToStorage('app_accounts', next); return next; });
+  const handleDeleteAccount = (accId: string) => setUserAccounts((prev) => { const next = prev.filter((a) => a.id !== accId); saveToStorage('app_accounts', next); return next; });
+  const handleSaveMonthlyBudget = (newBudget: number) => { setMonthlyBudget(newBudget); saveToStorage('app_monthly_budget', newBudget); };
   const handleLockApp = () => setIsAppLocked(true);
   const handleUnlockApp = (pin: string) => { if (pin === '1234') { setIsAppLocked(false); return true; } return false; };
   const unspentAmount = Math.max(0, monthlyBudget - monthStats.snapshot.expenses);
