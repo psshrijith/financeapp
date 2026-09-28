@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
-import { loadFromStorage, saveToStorage } from '@/utils/storage-helper';
+import { loadFromStorage, loadFromStorageAsync, saveToStorage } from '@/utils/storage-helper';
 import { DUMMY_RECENT_TRANSACTIONS, DUMMY_FINANCIAL_SNAPSHOT, DUMMY_NET_WORTH_DATA } from '@/data/dummy-finance-data';
 import { RESTORED_TRANSACTIONS, RESTORED_SNAPSHOT, RESTORED_CATEGORIES, RESTORED_NET_WORTH } from '@/data/restored-data-loader';
 import { AccountItem, Transaction, TransactionType, SpendingCategory } from '@/types/finance';
@@ -31,6 +31,23 @@ export function useFinanceAppState() {
   const [userAccounts, setUserAccounts] = useState<AccountItem[]>(() => loadFromStorage('app_accounts', []));
 
   const isMounted = useRef(false);
+
+  useEffect(() => {
+    (async () => {
+      const [t, b, c, txs, accs] = await Promise.all([
+        loadFromStorageAsync<AppThemeMode>('app_theme_mode', 'dim'),
+        loadFromStorageAsync<number>('app_monthly_budget', 50000),
+        loadFromStorageAsync<CategoryItem[]>('app_categories', BACKUP_CATEGORIES),
+        loadFromStorageAsync<Transaction[]>('app_transactions', []),
+        loadFromStorageAsync<AccountItem[]>('app_accounts', []),
+      ]);
+      if (t) setThemeMode(t);
+      if (b) setMonthlyBudget(b);
+      if (c?.length) setManagedCategories(c);
+      if (txs?.length) setUserTransactions(txs);
+      if (accs?.length) setUserAccounts(accs);
+    })();
+  }, []);
 
   useEffect(() => {
     if (!isMounted.current) {
@@ -93,21 +110,11 @@ export function useFinanceAppState() {
 
   const handleAddTransaction = (newTxData: { title: string; amount: number; type: TransactionType; category: string; emoji: string }) => {
     const newTx = createNewTransaction(newTxData);
-    setUserTransactions((prev) => {
-      const next = [newTx, ...prev];
-      saveToStorage('app_transactions', next);
-      return next;
-    });
+    setUserTransactions((prev) => { const next = [newTx, ...prev]; saveToStorage('app_transactions', next); return next; });
     setUserSnapshot((prev) => updateSnapshotWithTransaction(prev, newTxData.amount, newTxData.type));
   };
 
-  const handleDeleteTransaction = (txId: string) => {
-    setUserTransactions((prev) => {
-      const next = prev.filter((t) => t.id !== txId);
-      saveToStorage('app_transactions', next);
-      return next;
-    });
-  };
+  const handleDeleteTransaction = (txId: string) => setUserTransactions((prev) => { const next = prev.filter((t) => t.id !== txId); saveToStorage('app_transactions', next); return next; });
   const handleAddAccount = (acc: AccountItem) => setUserAccounts((prev) => { const next = [acc, ...prev]; saveToStorage('app_accounts', next); return next; });
   const handleDeleteAccount = (accId: string) => setUserAccounts((prev) => { const next = prev.filter((a) => a.id !== accId); saveToStorage('app_accounts', next); return next; });
   const handleSaveMonthlyBudget = (newBudget: number) => { setMonthlyBudget(newBudget); saveToStorage('app_monthly_budget', newBudget); };
@@ -116,10 +123,7 @@ export function useFinanceAppState() {
   const unspentAmount = Math.max(0, monthlyBudget - monthStats.snapshot.expenses);
   const handleRolloverToBudget = () => { setMonthlyBudget((prev) => prev + unspentAmount); setIsRolloverModalVisible(false); };
   const handleMoveToSavings = () => {
-    setUserAccounts((prev) => [
-      ...prev,
-      { id: Date.now().toString(), name: 'Unspent Rollover', type: 'investment', amount: unspentAmount, emoji: '🏦', categoryName: 'Savings', color: '#10B981' },
-    ]);
+    setUserAccounts((prev) => [...prev, { id: Date.now().toString(), name: 'Unspent Rollover', type: 'investment', amount: unspentAmount, emoji: '🏦', categoryName: 'Savings', color: '#10B981' }]);
     setIsRolloverModalVisible(false);
   };
 
