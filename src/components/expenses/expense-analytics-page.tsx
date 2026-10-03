@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import { useState, useMemo } from 'react';
 import { View, Text, ScrollView, Pressable } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
@@ -137,7 +137,6 @@ export function ExpenseAnalyticsPage({ transactions, monthlyBudget, onSetMonthly
         </View>
       )}
 
-      {/* Day-by-Day Expenses Breakdown */}
       <DayByDayExpensesList dayGroups={filteredData.dayGroups} onDeleteTransaction={onDeleteTransaction} />
     </ScrollView>
   );
