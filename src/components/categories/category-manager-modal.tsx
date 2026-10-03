@@ -38,7 +38,6 @@ export function CategoryManagerModal({
     <Modal visible={visible} transparent animationType="slide">
       <View className="flex-1 bg-black/70 justify-end">
         <View className="bg-slate-900 border-t border-slate-800 rounded-t-3xl p-6 max-h-[85%]">
-          {/* Header */}
           <View className="flex-row justify-between items-center mb-5">
             <Text className="text-[20px] font-bold text-white tracking-tight">
               Manage Categories
@@ -48,7 +47,6 @@ export function CategoryManagerModal({
             </Pressable>
           </View>
 
-          {/* Add Category Form */}
           <View className="bg-slate-950 border border-slate-800 p-4 rounded-2xl mb-5 space-y-3">
             <Text className="text-[12px] uppercase font-semibold text-slate-400">
               Add New Category
@@ -78,7 +76,6 @@ export function CategoryManagerModal({
             </Pressable>
           </View>
 
-          {/* Existing Categories List */}
           <Text className="text-[12px] uppercase font-semibold text-slate-400 mb-3">
             Existing Categories ({categories.length})
           </Text>

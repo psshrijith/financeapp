@@ -16,9 +16,11 @@ const MONTH_MAP: Record<string, string> = { Jan: '-01-', Feb: '-02-', Mar: '-03-
 interface ExpenseAnalyticsPageProps { transactions: Transaction[]; monthlyBudget?: number; onSetMonthlyBudget?: () => void; onOpenRolloverModal?: () => void; onDeleteTransaction?: (txId: string) => void; themeMode?: AppThemeMode; }
 
 export function ExpenseAnalyticsPage({ transactions, monthlyBudget, onSetMonthlyBudget, onOpenRolloverModal, onDeleteTransaction, themeMode = 'dim' }: ExpenseAnalyticsPageProps) {
+  const shortMonthName = new Date(Date.now()).toLocaleString('en-US', { month: 'short' });
   const safeAreaInsets = useSafeAreaInsets();
   const [selectedYear, setSelectedYear] = useState('2026');
-  const [selectedMonth, setSelectedMonth] = useState('Sep');
+  
+  const [selectedMonth, setSelectedMonth] = useState(shortMonthName);
 
   const filteredData = useMemo(() => {
     let list = transactions;
