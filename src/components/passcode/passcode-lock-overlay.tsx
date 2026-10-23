@@ -128,3 +128,4 @@ export function PasscodeLockOverlay({ visible, themeMode = 'dim', onUnlock }: Pa
     </Modal>
   );
 }
+
