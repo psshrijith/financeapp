@@ -101,4 +101,5 @@ export function CategoryManagerModal({
       </View>
     </Modal>
   );
-}
+
+
