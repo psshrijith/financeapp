@@ -29,7 +29,6 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
-          cache: 'gradle'
 
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -48,6 +47,8 @@ jobs:
           chmod +x android/gradlew
 
       - name: Build Android APK with Gradle
+        env:
+          GRADLE_OPTS: "-Xmx3072m -XX:MaxMetaspaceSize=512m"
         run: |
           cd android
           BUILD_TYPE="${{ inputs.build_type || 'release' }}"
