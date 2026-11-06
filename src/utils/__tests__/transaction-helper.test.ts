@@ -46,6 +46,7 @@ describe('transaction-helper', () => {
   });
 
   it('calculates current month totals accurately from transactions', () => {
+    const curMonthKey = new Date().toISOString().slice(0, 7);
     const sampleTxs: Transaction[] = [
       {
         id: '1',
@@ -53,7 +54,7 @@ describe('transaction-helper', () => {
         amount: 50000,
         type: 'income',
         category: 'Income',
-        date: '2026-09-01',
+        date: `${curMonthKey}-01`,
         iconBg: '#D1FAE5',
       },
       {
@@ -62,7 +63,7 @@ describe('transaction-helper', () => {
         amount: 15000,
         type: 'expense',
         category: 'Rent',
-        date: '2026-09-05',
+        date: `${curMonthKey}-05`,
         iconBg: '#FEF3C7',
       },
     ];

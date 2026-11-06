@@ -11,16 +11,17 @@ import { groupTransactionsByDay } from '@/utils/transaction-helper';
 
 import { AppThemeMode } from '../more/theme-modal';
 
+const MONTH_NAMES = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 const MONTH_MAP: Record<string, string> = { Jan: '-01-', Feb: '-02-', Mar: '-03-', Apr: '-04-', May: '-05-', Jun: '-06-', Jul: '-07-', Aug: '-08-', Sep: '-09-', Oct: '-10-', Nov: '-11-', Dec: '-12-' };
 
 interface ExpenseAnalyticsPageProps { transactions: Transaction[]; monthlyBudget?: number; onSetMonthlyBudget?: () => void; onOpenRolloverModal?: () => void; onDeleteTransaction?: (txId: string) => void; themeMode?: AppThemeMode; }
 
 export function ExpenseAnalyticsPage({ transactions, monthlyBudget, onSetMonthlyBudget, onOpenRolloverModal, onDeleteTransaction, themeMode = 'dim' }: ExpenseAnalyticsPageProps) {
-  const shortMonthName = new Date(Date.now()).toLocaleString('en-US', { month: 'short' });
+  const currentMonth = MONTH_NAMES[new Date().getMonth()];
+  const currentYear = String(new Date().getFullYear());
   const safeAreaInsets = useSafeAreaInsets();
-  const [selectedYear, setSelectedYear] = useState('2026');
-  
-  const [selectedMonth, setSelectedMonth] = useState(shortMonthName);
+  const [selectedYear, setSelectedYear] = useState(currentYear);
+  const [selectedMonth, setSelectedMonth] = useState(currentMonth);
 
   const filteredData = useMemo(() => {
     let list = transactions;
