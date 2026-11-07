@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef } from 'react';
+import { AppState, AppStateStatus } from 'react-native';
 import { loadFromStorage, loadFromStorageAsync, saveToStorage } from '@/utils/storage-helper';
 import { DUMMY_RECENT_TRANSACTIONS, DUMMY_FINANCIAL_SNAPSHOT, DUMMY_NET_WORTH_DATA } from '@/data/dummy-finance-data';
 import { RESTORED_TRANSACTIONS, RESTORED_SNAPSHOT, RESTORED_CATEGORIES, RESTORED_NET_WORTH } from '@/data/restored-data-loader';
@@ -10,7 +11,13 @@ import { BACKUP_CATEGORIES, CategoryItem } from '@/constants/categories';
 import { AppThemeMode } from '@/components/more/theme-modal';
 
 export function useFinanceAppState() {
+  const [appPasscode, setAppPasscode] = useState<string | null>(() => loadFromStorage('app_passcode', null));
+  const [isAppLockEnabled, setIsAppLockEnabled] = useState<boolean>(() => loadFromStorage('app_lock_enabled', false));
   const [isAppLocked, setIsAppLocked] = useState(false);
+  const [isFirstTimeSecurityModalVisible, setIsFirstTimeSecurityModalVisible] = useState(false);
+  const [isPasscodeSetupModalVisible, setIsPasscodeSetupModalVisible] = useState(false);
+  const [isChangingPasscode, setIsChangingPasscode] = useState(false);
+
   const [themeMode, setThemeMode] = useState<AppThemeMode>(() => loadFromStorage('app_theme_mode', 'dim'));
   const [isThemeModalVisible, setIsThemeModalVisible] = useState(false);
   const [showCategorySplit, setShowCategorySplit] = useState(true);
@@ -31,22 +38,66 @@ export function useFinanceAppState() {
   const [userAccounts, setUserAccounts] = useState<AccountItem[]>(() => loadFromStorage('app_accounts', []));
 
   const isMounted = useRef(false);
+  const isAppLockEnabledRef = useRef(isAppLockEnabled);
+  const appPasscodeRef = useRef(appPasscode);
+
+  useEffect(() => {
+    isAppLockEnabledRef.current = isAppLockEnabled;
+  }, [isAppLockEnabled]);
+
+  useEffect(() => {
+    appPasscodeRef.current = appPasscode;
+  }, [appPasscode]);
 
   useEffect(() => {
     (async () => {
-      const [t, b, c, txs, accs] = await Promise.all([
+      const [t, b, c, txs, accs, savedPasscode, lockEnabled, hasSeenOnboarding] = await Promise.all([
         loadFromStorageAsync<AppThemeMode>('app_theme_mode', 'dim'),
         loadFromStorageAsync<number>('app_monthly_budget', 50000),
         loadFromStorageAsync<CategoryItem[]>('app_categories', BACKUP_CATEGORIES),
         loadFromStorageAsync<Transaction[]>('app_transactions', []),
         loadFromStorageAsync<AccountItem[]>('app_accounts', []),
+        loadFromStorageAsync<string | null>('app_passcode', null),
+        loadFromStorageAsync<boolean>('app_lock_enabled', false),
+        loadFromStorageAsync<boolean>('has_seen_security_onboarding', false),
       ]);
       if (t) setThemeMode(t);
       if (b) setMonthlyBudget(b);
       if (c?.length) setManagedCategories(c);
       if (txs?.length) setUserTransactions(txs);
       if (accs?.length) setUserAccounts(accs);
+
+      if (savedPasscode) {
+        setAppPasscode(savedPasscode);
+        appPasscodeRef.current = savedPasscode;
+      }
+      if (typeof lockEnabled === 'boolean') {
+        setIsAppLockEnabled(lockEnabled);
+        isAppLockEnabledRef.current = lockEnabled;
+      }
+
+      // Check lock and onboarding triggers on initial startup
+      if (lockEnabled && savedPasscode) {
+        setIsAppLocked(true);
+      } else if (!hasSeenOnboarding && !savedPasscode) {
+        setIsFirstTimeSecurityModalVisible(true);
+      }
     })();
+  }, []);
+
+  // Listen to AppState for auto-locking when app resumes from background
+  useEffect(() => {
+    const subscription = AppState.addEventListener('change', (nextAppState: AppStateStatus) => {
+      if (nextAppState === 'active') {
+        if (isAppLockEnabledRef.current && appPasscodeRef.current) {
+          setIsAppLocked(true);
+        }
+      }
+    });
+
+    return () => {
+      subscription.remove();
+    };
   }, []);
 
   useEffect(() => {
@@ -118,8 +169,65 @@ export function useFinanceAppState() {
   const handleAddAccount = (acc: AccountItem) => setUserAccounts((prev) => { const next = [acc, ...prev]; saveToStorage('app_accounts', next); return next; });
   const handleDeleteAccount = (accId: string) => setUserAccounts((prev) => { const next = prev.filter((a) => a.id !== accId); saveToStorage('app_accounts', next); return next; });
   const handleSaveMonthlyBudget = (newBudget: number) => { setMonthlyBudget(newBudget); saveToStorage('app_monthly_budget', newBudget); };
-  const handleLockApp = () => setIsAppLocked(true);
-  const handleUnlockApp = (pin: string) => { if (pin === '1234') { setIsAppLocked(false); return true; } return false; };
+
+  // Passcode security handlers
+  const handleLockApp = () => {
+    if (appPasscode) {
+      setIsAppLocked(true);
+    } else {
+      setIsChangingPasscode(false);
+      setIsPasscodeSetupModalVisible(true);
+    }
+  };
+
+  const handleUnlockApp = (pin: string): boolean => {
+    if (appPasscode && pin === appPasscode) {
+      setIsAppLocked(false);
+      return true;
+    }
+    return false;
+  };
+
+  const handleSavePasscode = (newPin: string) => {
+    setAppPasscode(newPin);
+    setIsAppLockEnabled(true);
+    appPasscodeRef.current = newPin;
+    isAppLockEnabledRef.current = true;
+    saveToStorage('app_passcode', newPin);
+    saveToStorage('app_lock_enabled', true);
+    saveToStorage('has_seen_security_onboarding', true);
+    setIsPasscodeSetupModalVisible(false);
+    setIsFirstTimeSecurityModalVisible(false);
+  };
+
+  const handleToggleAppLock = () => {
+    if (!appPasscode) {
+      setIsChangingPasscode(false);
+      setIsPasscodeSetupModalVisible(true);
+      return;
+    }
+    const next = !isAppLockEnabled;
+    setIsAppLockEnabled(next);
+    isAppLockEnabledRef.current = next;
+    saveToStorage('app_lock_enabled', next);
+  };
+
+  const handleStartChangePasscode = () => {
+    setIsChangingPasscode(true);
+    setIsPasscodeSetupModalVisible(true);
+  };
+
+  const handleDismissFirstTimeSecurity = () => {
+    saveToStorage('has_seen_security_onboarding', true);
+    setIsFirstTimeSecurityModalVisible(false);
+  };
+
+  const handleOpenSetupFromFirstTime = () => {
+    setIsFirstTimeSecurityModalVisible(false);
+    setIsChangingPasscode(false);
+    setIsPasscodeSetupModalVisible(true);
+  };
+
   const unspentAmount = Math.max(0, monthlyBudget - monthStats.snapshot.expenses);
   const handleRolloverToBudget = () => { setMonthlyBudget((prev) => prev + unspentAmount); setIsRolloverModalVisible(false); };
   const handleMoveToSavings = () => {
@@ -128,7 +236,22 @@ export function useFinanceAppState() {
   };
 
   return {
-    isAppLocked, handleLockApp, handleUnlockApp,
+    isAppLocked,
+    handleLockApp,
+    handleUnlockApp,
+    appPasscode,
+    isAppLockEnabled,
+    handleSavePasscode,
+    handleToggleAppLock,
+    handleStartChangePasscode,
+    isFirstTimeSecurityModalVisible,
+    setIsFirstTimeSecurityModalVisible,
+    isPasscodeSetupModalVisible,
+    setIsPasscodeSetupModalVisible,
+    isChangingPasscode,
+    handleDismissFirstTimeSecurity,
+    handleOpenSetupFromFirstTime,
+
     themeMode, setThemeMode, isThemeModalVisible, setIsThemeModalVisible,
     showCategorySplit, setShowCategorySplit, useDemoData, setUseDemoData,
     isAddModalVisible, setIsAddModalVisible, isCategoryModalVisible, setIsCategoryModalVisible,

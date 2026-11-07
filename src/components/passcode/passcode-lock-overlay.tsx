@@ -26,7 +26,7 @@ export function PasscodeLockOverlay({ visible, themeMode = 'dim', onUnlock }: Pa
           setPin('');
           setErrorMsg('');
         } else {
-          setErrorMsg('Incorrect passcode. Try default PIN: 1234');
+          setErrorMsg('Incorrect passcode. Please try again.');
           setPin('');
         }
       }, 150);
@@ -40,24 +40,18 @@ export function PasscodeLockOverlay({ visible, themeMode = 'dim', onUnlock }: Pa
     }
   };
 
-  const handleFaceIdUnlock = () => {
-    onUnlock('1234');
-    setPin('');
-    setErrorMsg('');
-  };
-
   const bgClass = themeMode === 'lights-out' ? 'bg-black' : 'bg-slate-950';
 
   return (
-    <Modal visible={visible} animationType="fade" transparent={false}>
+    <Modal visible={visible} animationType="fade" transparent={false} statusBarTranslucent>
       <View className={`flex-1 ${bgClass} justify-between items-center py-14 px-6`}>
         {/* Lock Header */}
-        <View className="items-center mt-6">
+        <View className="items-center mt-8">
           <View className="w-16 h-16 rounded-3xl bg-emerald-500/15 border border-emerald-500/40 items-center justify-center mb-4">
             <Ionicons name="lock-closed" size={32} color="#34D399" />
           </View>
           <Text className="text-[24px] font-bold text-white tracking-tight">Finance Pro Locked</Text>
-          <Text className="text-[13px] text-slate-400 mt-1">Enter 4-digit passcode to unlock (Default: 1234)</Text>
+          <Text className="text-[13px] text-slate-400 mt-1">Enter your 4-digit passcode to unlock</Text>
         </View>
 
         {/* PIN Indicators */}
@@ -105,11 +99,7 @@ export function PasscodeLockOverlay({ visible, themeMode = 'dim', onUnlock }: Pa
           ))}
 
           <View className="flex-row justify-between items-center">
-            <Pressable
-              onPress={handleFaceIdUnlock}
-              className="w-20 h-20 rounded-full bg-slate-900/40 border border-slate-800/50 items-center justify-center active:opacity-70">
-              <Ionicons name="scan-outline" size={24} color="#34D399" />
-            </Pressable>
+            <View className="w-20 h-20 items-center justify-center" />
 
             <Pressable
               onPress={() => handleKeyPress('0')}
@@ -128,4 +118,3 @@ export function PasscodeLockOverlay({ visible, themeMode = 'dim', onUnlock }: Pa
     </Modal>
   );
 }
-

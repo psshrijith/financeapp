@@ -2,8 +2,8 @@ import React from 'react';
 import { View, Text, ScrollView } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { SettingsList } from './settings-list';
 
+import { SettingsList } from './settings-list';
 import { AppThemeMode } from './theme-modal';
 
 interface MorePageProps {
@@ -19,6 +19,10 @@ interface MorePageProps {
   isRestored?: boolean;
   themeMode?: AppThemeMode;
   onOpenThemeModal?: () => void;
+  isAppLockEnabled?: boolean;
+  hasPasscode?: boolean;
+  onToggleAppLock?: () => void;
+  onChangePasscode?: () => void;
   onLockApp?: () => void;
 }
 
@@ -35,6 +39,10 @@ export function MorePage({
   isRestored,
   themeMode = 'dim',
   onOpenThemeModal,
+  isAppLockEnabled,
+  hasPasscode,
+  onToggleAppLock,
+  onChangePasscode,
   onLockApp,
 }: MorePageProps) {
   const safeAreaInsets = useSafeAreaInsets();
@@ -78,12 +86,13 @@ export function MorePage({
         isRestored={isRestored}
         themeMode={themeMode}
         onOpenThemeModal={onOpenThemeModal}
+        isAppLockEnabled={isAppLockEnabled}
+        hasPasscode={hasPasscode}
+        onToggleAppLock={onToggleAppLock}
+        onChangePasscode={onChangePasscode}
         onLockApp={onLockApp}
       />
     </ScrollView>
   );
 }
-
 export default MorePage;
-
-

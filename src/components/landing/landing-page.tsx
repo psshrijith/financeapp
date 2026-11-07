@@ -14,6 +14,8 @@ import { AddAccountModal } from '../net-worth/add-account-modal';
 import { SetBudgetModal } from '../more/set-budget-modal';
 import { ThemeModal } from '../more/theme-modal';
 import { PasscodeLockOverlay } from '../passcode/passcode-lock-overlay';
+import { FirstTimeSecurityModal } from '../passcode/first-time-security-modal';
+import { PasscodeSetupModal } from '../passcode/passcode-setup-modal';
 import { UnspentRolloverModal } from './unspent-rollover-modal';
 
 export function LandingPage() {
@@ -64,7 +66,11 @@ export function LandingPage() {
           isRestored={state.isRestored}
           themeMode={state.themeMode}
           onOpenThemeModal={() => state.setIsThemeModalVisible(true)}
-          onLockApp={() => state.handleLockApp()}
+          isAppLockEnabled={state.isAppLockEnabled}
+          hasPasscode={Boolean(state.appPasscode)}
+          onToggleAppLock={state.handleToggleAppLock}
+          onChangePasscode={state.handleStartChangePasscode}
+          onLockApp={state.handleLockApp}
         />
       ) : (
         <HomeView
@@ -84,10 +90,29 @@ export function LandingPage() {
         onPressAdd={handlePressAdd}
       />
 
+      {/* Lock Overlay when app is locked */}
       <PasscodeLockOverlay
         visible={state.isAppLocked}
         themeMode={state.themeMode}
         onUnlock={state.handleUnlockApp}
+      />
+
+      {/* First-time User Security Onboarding Prompt */}
+      <FirstTimeSecurityModal
+        visible={state.isFirstTimeSecurityModalVisible}
+        themeMode={state.themeMode}
+        onSetupPasscode={state.handleOpenSetupFromFirstTime}
+        onSkip={state.handleDismissFirstTimeSecurity}
+      />
+
+      {/* Passcode Setup / Change Modal */}
+      <PasscodeSetupModal
+        visible={state.isPasscodeSetupModalVisible}
+        themeMode={state.themeMode}
+        isChangingPasscode={state.isChangingPasscode}
+        currentPasscode={state.appPasscode}
+        onClose={() => state.setIsPasscodeSetupModalVisible(false)}
+        onSavePasscode={state.handleSavePasscode}
       />
 
       <ThemeModal

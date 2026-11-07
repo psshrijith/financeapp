@@ -17,6 +17,10 @@ interface SettingsListProps {
   isRestored?: boolean;
   themeMode?: AppThemeMode;
   onOpenThemeModal?: () => void;
+  isAppLockEnabled?: boolean;
+  hasPasscode?: boolean;
+  onToggleAppLock?: () => void;
+  onChangePasscode?: () => void;
   onLockApp?: () => void;
 }
 
@@ -24,7 +28,15 @@ export function SettingsList(props: SettingsListProps) {
   return (
     <>
       <AppDataSettings {...props} />
-      <GeneralPreferences themeMode={props.themeMode} onOpenThemeModal={props.onOpenThemeModal} onLockApp={props.onLockApp} />
+      <GeneralPreferences
+        themeMode={props.themeMode}
+        onOpenThemeModal={props.onOpenThemeModal}
+        isAppLockEnabled={props.isAppLockEnabled}
+        hasPasscode={props.hasPasscode}
+        onToggleAppLock={props.onToggleAppLock}
+        onChangePasscode={props.onChangePasscode}
+        onLockApp={props.onLockApp}
+      />
     </>
   );
 }
